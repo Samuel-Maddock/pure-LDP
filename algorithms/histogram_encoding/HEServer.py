@@ -38,6 +38,14 @@ class HEServer:
         return round(float(fminbound(var, 0.5, 1)), 4)
 
     def aggregate(self, priv_data):
+        # Threshold rounding
+        if self.is_the:
+            for index, item in enumerate(priv_data):
+                if item <= self.theta:
+                    priv_data[index] = 0
+                else:
+                    priv_data[index] = 1
+
         self.aggregated_data += priv_data
         self.n += 1
 
