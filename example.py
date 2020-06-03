@@ -31,9 +31,8 @@ client_oue = UEClient(epsilon=epsilon, d=d)
 server_oue = UEServer(epsilon=epsilon, d=d)
 
 # Threshold Histogram Encoding (THE)
-client_the = HEClient(epsilon=epsilon, d=d, is_the=is_the)
+client_the = HEClient(epsilon=epsilon, d=d)
 server_the = HEServer(epsilon=epsilon, d=d, is_the=is_the)
-
 
 # Simulate client-side privatisation + server-side aggregation
 for index, item in enumerate(data):

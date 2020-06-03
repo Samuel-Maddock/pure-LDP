@@ -4,10 +4,9 @@ import math
 # Client-side for histogram-encoding
 
 class HEClient:
-    def __init__(self, epsilon, d, is_the=False, index_mapper=None):
+    def __init__(self, epsilon, d, index_mapper=None):
         self.epsilon = epsilon
         self.d = d
-        self.is_the = is_the
 
         if index_mapper is None:
             self.index_mapper = lambda x: x-1
@@ -26,6 +25,3 @@ class HEClient:
         oh_vec[index] = 1
 
         return self.__perturb(oh_vec)
-
-
-client = HEClient(3, 4)
