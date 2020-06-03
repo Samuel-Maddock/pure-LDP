@@ -7,7 +7,7 @@ import xxhash
 # Very loosely based on code by Wang (https://github.com/vvv214/LDP_Protocols/blob/master/olh.py)
 
 class LHClient:
-    def __init__(self, epsilon, g, is_olh=False, index_mapper=None):
+    def __init__(self, epsilon, g=2, is_olh=False, index_mapper=None):
         self.epsilon = epsilon
         self.g = g
 
@@ -25,7 +25,7 @@ class LHClient:
     def __perturb(self, data, seed):
         index = self.index_mapper(data)
 
-        # Taken directly from Wang (https://github.com/vvv214/LDP_Protocols/blob/master/olh.py)
+        # Taken directly from Wang (https://github.com/vvv214/LDP_Protocols/blob/master/olh.py#L55-L65)
         x = (xxhash.xxh32(str(index), seed=seed).intdigest() % self.g)
         y = x
 
