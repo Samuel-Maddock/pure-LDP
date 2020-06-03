@@ -61,7 +61,7 @@ for i in range(0,d):
     mse_arr[1] += (oue_estimates[i] - original_freq[i])**2
     mse_arr[2] += (the_estimates[i] - original_freq[i])**2
 
-mse_arr = mse_arr/len(data)
+mse_arr = mse_arr/d
 
 # Output:
 print("\n")
