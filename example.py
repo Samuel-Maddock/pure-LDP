@@ -76,17 +76,3 @@ print("OLH Estimates:", olh_estimates)
 print("OUE Estimates:", oue_estimates)
 print("THE Estimates:", the_estimates)
 print("Note: We round estimates to the nearest integer")
-
-
-# start = time.time()
-# for index, item in enumerate(data):
-#     priv_oue_data = client_oue.privatise(item)
-# end = time.time()
-# print("Old Privatise", end - start)
-#
-# start = time.time()
-# for index, item in enumerate(data):
-#     priv_oue_data = client_oue.fast_privatise(item)
-# end = time.time()
-# print("New Privatise", end - start)
-
