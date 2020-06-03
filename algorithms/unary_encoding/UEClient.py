@@ -23,19 +23,11 @@ class UEClient:
         else:
             self.index_mapper = index_mapper
 
-    def __perturb(self, oh_vec):
-        for index, entry in enumerate(oh_vec):
-            if entry == 1:
-                oh_vec[index] = np.random.choice([1, 0], p=[self.p, 1-self.p]) # If entry is 1, keep as 1 with prob p
-            else:
-                oh_vec[index] = np.random.choice([1, 0], p=[self.q, 1-self.q])  # If entry is 0, flip with prob q
-
+    def __perturb(self, index):
+        oh_vec = np.random.choice([1, 0], size=self.d, p=[self.q, 1-self.q])  # If entry is 0, flip with prob q
+        oh_vec[index] = np.random.choice([1, 0], p=[self.p, 1-self.p]) # If entry is 1, keep as 1 with prob p
         return oh_vec
 
     def privatise(self, data):
         index = self.index_mapper(data)
-
-        oh_vec = np.zeros(self.d)
-        oh_vec[index] = 1
-
-        return self.__perturb(oh_vec)
+        return self.__perturb(index)
