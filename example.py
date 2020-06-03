@@ -8,6 +8,7 @@ from algorithms.histogram_encoding.HEClient import HEClient
 from algorithms.histogram_encoding.HEServer import HEServer
 
 import numpy as np
+import time
 from collections import Counter
 
 # Super simple synthetic dataset
@@ -51,9 +52,9 @@ the_estimates = []
 mse_arr = np.zeros(3)
 
 for i in range(0, d):
-    olh_estimates.append(server_olh.estimate(i+1))
-    oue_estimates.append(server_oue.estimate(i+1))
-    the_estimates.append(server_the.estimate(i+1))
+    olh_estimates.append(round(server_olh.estimate(i+1)))
+    oue_estimates.append(round(server_oue.estimate(i+1)))
+    the_estimates.append(round(server_the.estimate(i+1)))
 
 # Calculate variance
 for i in range(0,d):
@@ -63,8 +64,29 @@ for i in range(0,d):
 
 mse_arr = mse_arr/len(data)
 
+# Output:
+print("\n")
 print("Experiment run on a dataset of size", len(data), "with d=",d, "and epsilon=",epsilon, "\n")
 print("Optimised Local Hashing (OLH) Variance: ", mse_arr[0])
 print("Optimised Unary Encoding (OUE) Variance: ", mse_arr[1])
 print("Threshold Histogram Encoding (THE) Variance: ", mse_arr[2])
+print("\n")
+print("Original Frequencies:", original_freq)
+print("OLH Estimates:", olh_estimates)
+print("OUE Estimates:", oue_estimates)
+print("THE Estimates:", the_estimates)
+print("Note: We round estimates to the nearest integer")
+
+
+# start = time.time()
+# for index, item in enumerate(data):
+#     priv_oue_data = client_oue.privatise(item)
+# end = time.time()
+# print("Old Privatise", end - start)
+#
+# start = time.time()
+# for index, item in enumerate(data):
+#     priv_oue_data = client_oue.fast_privatise(item)
+# end = time.time()
+# print("New Privatise", end - start)
 
