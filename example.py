@@ -23,16 +23,16 @@ is_oue = True
 is_olh = True
 
 # Optimal Local Hashing (OLH)
-client_olh = LHClient(epsilon=epsilon, is_olh=True)
-server_olh = LHServer(epsilon=epsilon, d=d, is_olh=True)
+client_olh = LHClient(epsilon=epsilon, use_olh=True)
+server_olh = LHServer(epsilon=epsilon, d=d, use_olh=True)
 
 # Optimal Unary Encoding (OUE)
-client_oue = UEClient(epsilon=epsilon, d=d)
-server_oue = UEServer(epsilon=epsilon, d=d)
+client_oue = UEClient(epsilon=epsilon, d=d, use_oue=True)
+server_oue = UEServer(epsilon=epsilon, d=d, use_oue=True)
 
 # Threshold Histogram Encoding (THE)
 client_the = HEClient(epsilon=epsilon, d=d)
-server_the = HEServer(epsilon=epsilon, d=d, is_the=is_the)
+server_the = HEServer(epsilon=epsilon, d=d, use_the=is_the)
 
 # Simulate client-side privatisation + server-side aggregation
 for index, item in enumerate(data):

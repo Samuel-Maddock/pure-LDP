@@ -7,7 +7,7 @@ import xxhash
 # Very loosely based on code by Wang (https://github.com/vvv214/LDP_Protocols/blob/master/olh.py)
 
 class LHServer:
-    def __init__(self, epsilon, d, g=2, is_olh=False, index_mapper=None):
+    def __init__(self, epsilon, d, g=2, use_olh=False, index_mapper=None):
         self.epsilon = epsilon
         self.g = g
         self.d = d
@@ -15,7 +15,7 @@ class LHServer:
         self.aggregated_data = np.zeros(self.d)
         self.estimated_data = np.zeros(self.d)
 
-        if is_olh is True:
+        if use_olh is True:
             self.g = int(round(math.exp(self.epsilon))) + 1
 
         self.p = math.exp(self.epsilon) / (math.exp(self.epsilon) + self.g - 1)

@@ -2,7 +2,7 @@ import numpy as np
 import math
 
 class UEServer:
-    def __init__(self, epsilon, d, is_oue=False, index_mapper=None):
+    def __init__(self, epsilon, d, use_oue=False, index_mapper=None):
         self.epsilon = epsilon
         self. d = d
         self.n = 0
@@ -12,7 +12,7 @@ class UEServer:
         self.p = const / (const + 1)
         self.q = 1-self.p
 
-        if is_oue is True:
+        if use_oue is True:
             self.p = 0.5
             self.q = 1/(math.pow(math.e, self.epsilon) + 1)
 

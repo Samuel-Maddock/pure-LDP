@@ -5,14 +5,14 @@ from scipy.optimize import fminbound
 # Client-side for histogram-encoding
 
 class HEServer:
-    def __init__(self, epsilon, d, is_the=False, theta=None, index_mapper=None):
+    def __init__(self, epsilon, d, use_the=False, theta=None, index_mapper=None):
         self.epsilon = epsilon
         self.d = d
         self.n = 0
         self.aggregated_data = np.zeros(d)
-        self.is_the = is_the
+        self.is_the = use_the
 
-        if is_the is True:
+        if use_the is True:
             self.theta = theta
             if theta is None:
                 self.theta = self.__find_optimal_theta()
