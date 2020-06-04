@@ -1,3 +1,4 @@
 xxhash
 numpy
 scipy
+bitstring
