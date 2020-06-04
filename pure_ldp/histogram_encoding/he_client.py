@@ -1,24 +1,50 @@
 import numpy as np
 import math
 
+
 # Client-side for histogram-encoding
 
 class HEClient:
     def __init__(self, epsilon, d, index_mapper=None):
+        """
+
+        Args:
+            epsilon: float - the privacy budget
+            d: integer - the size of the data domain
+            index_mapper: Optional function - maps data items to indexes in the range {0, 1, ..., d-1} where d is the size of the data domain
+        """
         self.epsilon = epsilon
         self.d = d
 
         if index_mapper is None:
-            self.index_mapper = lambda x: x-1
+            self.index_mapper = lambda x: x - 1
         else:
             self.index_mapper = index_mapper
 
     def __perturb(self, oh_vec):
-        noise = np.random.laplace(scale=(2/self.epsilon), size=self.d)
+        """
+        Used internally to peturb data using Laplacian noise following the histogram encoding technique.
+
+        Args:
+            oh_vec: A one-hot vector, where the entry of the user's data item is set to 1 and everything else 0
+
+        Returns: a privatised noisy vector
+
+        """
+        noise = np.random.laplace(scale=(2 / self.epsilon), size=self.d)
         noisy_vec = oh_vec + noise
         return noisy_vec
 
     def privatise(self, data):
+        """
+        Used to privatise a user's data using histogram encoding (Laplace mechanism)
+
+        Args:
+            data: User's data item
+
+        Returns: Privatised data vector
+
+        """
         index = self.index_mapper(data)
 
         oh_vec = np.zeros(self.d)

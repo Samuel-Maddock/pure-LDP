@@ -6,6 +6,15 @@ from scipy.optimize import fminbound
 
 class HEServer:
     def __init__(self, epsilon, d, use_the=False, theta=None, index_mapper=None):
+        """
+
+        Args:
+            epsilon: float - the privacy budget
+            d: integer - the size of the data domain
+            use_the: Optional boolean - If set to true uses Thresholding Histogram Encoding (THE)
+            theta: Optional - If passed, will override the optimal theta value (not recommended)
+            index_mapper: Optional function - maps data items to indexes in the range {0, 1, ..., d-1} where d is the size of the data domain
+        """
         self.epsilon = epsilon
         self.d = d
         self.n = 0
@@ -28,7 +37,15 @@ class HEServer:
         self.__find_optimal_theta()
 
     def __find_optimal_theta(self):
+        """
+        Used internally to calculate the optimal value of theta if using Threshold Histogram Encoding (THE).
 
+        Find the optimal value of theta to use for thresholding, by minimising
+        the variance equation for the fixed value of epsilon.
+
+        Returns: float to 4dp - optimal theta parameter
+
+        """
         # Minimise variance for our fixed epsilon to find the optimal theta value for thresholding
         def var(x):
             num = 2 * math.exp(self.epsilon * x / 2) - 1
@@ -38,6 +55,12 @@ class HEServer:
         return round(float(fminbound(var, 0.5, 1)), 4)
 
     def aggregate(self, priv_data):
+        """
+        Aggregates HE privatised data, to allow us to calculate estimates.
+
+        Args:
+            priv_data: Data privatised via he_client.privatise
+        """
         # Threshold rounding
         if self.is_the:
             for index, item in enumerate(priv_data):
@@ -50,6 +73,15 @@ class HEServer:
         self.n += 1
 
     def estimate(self, data):
+        """
+        Calculates a frequency estimate of the given data item
+
+        Args:
+            data: data item
+
+        Returns: float - frequency estimate
+
+        """
         if self.aggregated_data is None:
             raise Exception("UEServer has aggregated no data, no estimation can be made")
 
