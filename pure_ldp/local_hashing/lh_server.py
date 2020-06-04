@@ -42,3 +42,5 @@ class LHServer:
         self.estimated_data = a * self.aggregated_data - b
         index = self.index_mapper(data)
         return self.estimated_data[index]
+
+

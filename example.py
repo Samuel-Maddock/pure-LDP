@@ -1,23 +1,23 @@
-from algorithms.unary_encoding.UEClient import UEClient
-from algorithms.unary_encoding.UEServer import UEServer
+from pure_ldp.unary_encoding.ue_client import UEClient
+from pure_ldp.unary_encoding.ue_server import UEServer
 
-from algorithms.local_hashing.LHClient import LHClient
-from algorithms.local_hashing.LHServer import LHServer
+from pure_ldp.local_hashing.lh_client import LHClient
+from pure_ldp.local_hashing.lh_server import LHServer
 
-from algorithms.histogram_encoding.HEClient import HEClient
-from algorithms.histogram_encoding.HEServer import HEServer
+from pure_ldp.histogram_encoding.he_client import HEClient
+from pure_ldp.histogram_encoding.he_server import HEServer
 
 import numpy as np
 import time
 from collections import Counter
 
 # Super simple synthetic dataset
-data = np.concatenate(([1]*8000, [2]*4000, [3]*1000, [4]*500))
+data = np.concatenate(([1]*8000, [2]*4000, [3]*1000, [4]*500, [5]*1000, [6]*1800, [7]*2000, [8]*300))
 original_freq = list(Counter(data).values()) # True frequencies of the dataset
 
 # Parameters for experiment
 epsilon = 3
-d = 4
+d = 8
 is_the = True
 is_oue = True
 is_olh = True
