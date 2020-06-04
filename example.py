@@ -7,6 +7,9 @@ from pure_ldp.local_hashing.lh_server import LHServer
 from pure_ldp.histogram_encoding.he_client import HEClient
 from pure_ldp.histogram_encoding.he_server import HEServer
 
+from pure_ldp.prefix_extending.pem_client import PEMClient
+from pure_ldp.prefix_extending.pem_server import PEMServer
+
 import numpy as np
 import time
 from collections import Counter
@@ -75,3 +78,22 @@ print("OLH Estimates:", olh_estimates)
 print("OUE Estimates:", oue_estimates)
 print("THE Estimates:", the_estimates)
 print("Note: We round estimates to the nearest integer")
+
+
+# Uncomment to run PEM code
+
+# pem_client = PEMClient(epsilon=3, domain_size=6, start_length=2, segment_length=2)
+# pem_server = PEMServer(epsilon=3, domain_size=6, start_length=2, segment_length=2)
+#
+# s1 = "101101"
+# s2 = "111111"
+# s3 = "100000"
+# s4 = "101100"
+#
+# data = np.concatenate(([s1]*8000, [s2]*4000, [s3]*1000, [s4]*500))
+#
+# for index,item in enumerate(data):
+#     pem_server.aggregate(*pem_client.privatise(item, index), index)
+#
+#
+# print(pem_server.find_top_k(3))
