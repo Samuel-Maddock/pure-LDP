@@ -5,8 +5,8 @@ pure-LDP is a Python package that provides simple implementations of pure LDP fr
 
 The package has implementations of all three main techniques:
 1. Unary Encoding - Under ```pure_ldp.local_hashing.ue_client``` and ```pure_ldp.local_hashing.ue_server``` 
-2. Histogram encoding - Under ```pure_ldp.local_hashing.lh_client``` and ```pure_ldp.local_hashing.lh_sever``` 
-3. Local Hashing - Under ```pure_ldp.local_hashing.he_client``` and ```pure_ldp.local_hashing.he_server``` 
+2. Histogram encoding - Under ```pure_ldp.local_hashing.he_client``` and ```pure_ldp.local_hashing.he_sever``` 
+3. Local Hashing - Under ```pure_ldp.local_hashing.lh_client``` and ```pure_ldp.local_hashing.lh_server``` 
 
 ## Installation
 
