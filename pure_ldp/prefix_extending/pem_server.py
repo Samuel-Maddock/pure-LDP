@@ -1,12 +1,9 @@
 from pure_ldp.local_hashing.lh_server import LHServer
 
 import math
-import numpy as np
-import random
 import itertools
 
 from bitstring import BitArray
-from bitarray import bitarray
 from collections import Counter
 
 
