@@ -1,5 +1,8 @@
 from setuptools import setup, find_packages
 
+with open("README.md", "r") as fh:
+    long_description = fh.read()
+
 setup(
     name='pure-ldp',
     version='1.0.0',
@@ -9,5 +12,7 @@ setup(
     license='',
     author='Samuel Maddock',
     author_email='samuel-maddock@hotmail.com',
-    description='Simple pure LDP frequency oracle implementations'
+    description='Simple pure LDP frequency oracle implementations',
+    long_description=long_description,
+    long_description_content_type="text/markdown",
 )
