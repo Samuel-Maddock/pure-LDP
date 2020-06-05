@@ -28,7 +28,7 @@ from pure-ldp.local_hashing.lh_server import LHServer
 # Using Optimal Local Hashing (OLH)
 
 epsilon = 3 # Privacy budget of 3
-d = 4 # For simplicity, we use a simple dataset with 4 possible data items
+d = 4 # For simplicity, we use a dataset with 4 possible data items
 
 client_olh = LHClient(epsilon=epsilon, use_olh=True)
 server_olh = LHServer(epsilon=epsilon, d=d, use_olh=True)
@@ -38,9 +38,7 @@ data = np.concatenate(([1]*4000, [2]*3000, [3]*2000, [4]*1000))
 
 for index, item in enumerate(data):
     # Simulate client-side process
-    print(item)
     priv_data = client_olh.privatise(item, index) # We use the user's index as a hash seed, in practice this should be randomly+uniquely generated
-    print(priv_data)
 
     # Simulate server-side aggregation
     server_olh.aggregate(priv_data, index)
