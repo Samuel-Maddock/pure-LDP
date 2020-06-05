@@ -1,6 +1,7 @@
 import numpy as np
 import math
 from scipy.optimize import fminbound
+import warnings
 
 # Client-side for histogram-encoding
 
@@ -72,18 +73,22 @@ class HEServer:
         self.aggregated_data += priv_data
         self.n += 1
 
-    def estimate(self, data):
+    def estimate(self, data, supress_warnings=False):
         """
         Calculates a frequency estimate of the given data item
 
         Args:
             data: data item
+            supress_warnings: Optional boolean - Supresses warnings about possible inaccurate estimations
 
         Returns: float - frequency estimate
 
         """
-        if self.aggregated_data is None:
-            raise Exception("UEServer has aggregated no data, no estimation can be made")
+        if not supress_warnings:
+            if self.n < 10000:
+                warnings.warn("HEServer has only aggregated small amounts of data (n=" + str(self.n) + ") estimations may be highly inaccurate", RuntimeWarning)
+            if self.epsilon < 1:
+                warnings.warn("High privacy has been detected (epsilon = " + str(self.epsilon) + "), estimations may be highly inaccurate on small datasets", RuntimeWarning)
 
         index = self.index_mapper(data)
 
