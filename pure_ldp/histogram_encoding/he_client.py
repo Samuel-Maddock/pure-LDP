@@ -1,10 +1,11 @@
 import numpy as np
 import math
 
+from pure_ldp.core import FreqOracleClient
 
 # Client-side for histogram-encoding
 
-class HEClient:
+class HEClient(FreqOracleClient):
     def __init__(self, epsilon, d, index_mapper=None):
         """
 
@@ -13,15 +14,9 @@ class HEClient:
             d: integer - the size of the data domain
             index_mapper: Optional function - maps data items to indexes in the range {0, 1, ..., d-1} where d is the size of the data domain
         """
-        self.epsilon = epsilon
-        self.d = d
+        super().__init__(epsilon, d, index_mapper=index_mapper)
 
-        if index_mapper is None:
-            self.index_mapper = lambda x: x - 1
-        else:
-            self.index_mapper = index_mapper
-
-    def __perturb(self, oh_vec):
+    def _perturb(self, oh_vec):
         """
         Used internally to peturb data using Laplacian noise following the histogram encoding technique.
 
@@ -50,4 +45,4 @@ class HEClient:
         oh_vec = np.zeros(self.d)
         oh_vec[index] = 1
 
-        return self.__perturb(oh_vec)
+        return self._perturb(oh_vec)

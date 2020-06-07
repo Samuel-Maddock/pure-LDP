@@ -1,11 +1,11 @@
 import numpy as np
 import math
 from scipy.optimize import fminbound
-import warnings
+from pure_ldp.core import FreqOracleServer
 
 # Client-side for histogram-encoding
 
-class HEServer:
+class HEServer(FreqOracleServer):
     def __init__(self, epsilon, d, use_the=False, theta=None, index_mapper=None):
         """
 
@@ -16,10 +16,10 @@ class HEServer:
             theta: Optional - If passed, will override the optimal theta value (not recommended)
             index_mapper: Optional function - maps data items to indexes in the range {0, 1, ..., d-1} where d is the size of the data domain
         """
-        self.epsilon = epsilon
-        self.d = d
-        self.n = 0
-        self.aggregated_data = np.zeros(d)
+
+        super().__init__(epsilon, d, index_mapper=index_mapper)
+        self.set_name("HEServer")
+
         self.is_the = use_the
 
         if use_the is True:
@@ -29,11 +29,6 @@ class HEServer:
 
             self.p = 1 - 0.5 * (math.pow(math.e, self.epsilon / 2 * (self.theta - 1)))
             self.q = 0.5 * (math.pow(math.e, -1 * self.theta * (self.epsilon / 2)))
-
-        if index_mapper is None:
-            self.index_mapper = lambda x: x - 1
-        else:
-            self.index_mapper = index_mapper
 
         self.__find_optimal_theta()
 
@@ -73,22 +68,18 @@ class HEServer:
         self.aggregated_data += priv_data
         self.n += 1
 
-    def estimate(self, data, supress_warnings=False):
+    def estimate(self, data, suppress_warnings=False):
         """
         Calculates a frequency estimate of the given data item
 
         Args:
             data: data item
-            supress_warnings: Optional boolean - Supresses warnings about possible inaccurate estimations
+            suppress_warnings: Optional boolean - Supresses warnings about possible inaccurate estimations
 
         Returns: float - frequency estimate
 
         """
-        if not supress_warnings:
-            if self.n < 10000:
-                warnings.warn("HEServer has only aggregated small amounts of data (n=" + str(self.n) + ") estimations may be highly inaccurate", RuntimeWarning)
-            if self.epsilon < 1:
-                warnings.warn("High privacy has been detected (epsilon = " + str(self.epsilon) + "), estimations may be highly inaccurate on small datasets", RuntimeWarning)
+        self.check_warnings(suppress_warnings=suppress_warnings)
 
         index = self.index_mapper(data)
 
