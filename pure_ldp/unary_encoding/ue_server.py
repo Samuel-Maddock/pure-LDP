@@ -1,4 +1,3 @@
-import numpy as np
 import math
 
 from pure_ldp.core import FreqOracleServer

@@ -1,7 +1,6 @@
 from pure_ldp.local_hashing.lh_client import LHClient
 
 import math
-import numpy as np
 import random
 
 from bitstring import BitArray

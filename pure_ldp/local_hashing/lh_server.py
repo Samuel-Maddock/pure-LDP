@@ -1,8 +1,5 @@
-import numpy as np
 import math
 import xxhash
-import warnings
-from scipy.linalg import hadamard
 
 from pure_ldp.core import FreqOracleServer
 
@@ -38,7 +35,7 @@ class LHServer(FreqOracleServer):
 
         Args:
             priv_data: Privatised data of the form returned from UEClient.privatise
-            seed: The seed of the user's hash function
+            seed: kwarg - The seed of the user's hash function, must be passed as a keyword arg
         """
         seed = kwargs.get("seed", 1)
 
