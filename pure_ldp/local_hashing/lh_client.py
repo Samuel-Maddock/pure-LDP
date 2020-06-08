@@ -1,7 +1,8 @@
 import numpy as np
 import math
 import xxhash
-
+from sys import maxsize
+import random
 from pure_ldp.core import FreqOracleClient
 
 # Client-side for local-hashing
@@ -59,16 +60,15 @@ class LHClient(FreqOracleClient):
 
         return y
 
-    def privatise(self, data, **kwargs):
+    def privatise(self, data):
         """
         Privatises a user's data using local hashing.
 
         Args:
             data: The data to be privatised
-            seed: The seed for that user's hash function, a seed should be uniquely assigned to every user
 
         Returns:
             privatised data: a single integer
         """
-        seed = kwargs.get("seed", 1)
+        seed = random.randint(0,maxsize) # This is sys.maxsize
         return self._perturb(data, seed), seed
