@@ -13,7 +13,7 @@ class UEServer(FreqOracleServer):
             use_oue: Optional boolean - If True, will use Optimised Unary Encoding (OUE)
             index_mapper: Optional function - maps data items to indexes in the range {0, 1, ..., d-1} where d is the size of the data domain
         """
-        super().__init__(epsilon, d)
+        super().__init__(epsilon, d, index_mapper=index_mapper)
         self.set_name("UEServer")
 
         const = math.pow(math.e, self.epsilon/2)
@@ -25,7 +25,7 @@ class UEServer(FreqOracleServer):
             self.q = 1/(math.pow(math.e, self.epsilon) + 1)
 
 
-    def aggregate(self, priv_data):
+    def aggregate(self, priv_data, **kwargs):
         """
         Used to aggregate privatised data by ue_client.privatise
 

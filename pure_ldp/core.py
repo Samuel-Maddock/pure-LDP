@@ -17,7 +17,7 @@ class FreqOracleClient:
     def _peturb(self, data):
         assert("Must Implement")
 
-    def privatise(self, data):
+    def privatise(self, data, **kwargs):
         assert("Must Implement")
 
 
@@ -28,7 +28,6 @@ class FreqOracleServer:
         self.aggregated_data = np.zeros(self.d)
         self.estimated_data = np.zeros(self.d)
         self.n = 0
-
         self.name = "FrequencyOracle"
 
         if index_mapper is None:
@@ -58,7 +57,7 @@ class FreqOracleServer:
                 warnings.warn("High privacy has been detected (epsilon = " + str(self.epsilon) +
                               "), estimations may be highly inaccurate on small datasets", RuntimeWarning)
 
-    def aggregate(self, data):
+    def aggregate(self, data, **kwargs):
         assert ("Must implement")
 
     def estimate(self, data, suppress_warnings=False):

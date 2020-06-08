@@ -17,7 +17,7 @@ class UEClient(FreqOracleClient):
             use_oue: Optional boolean - if True, will use Optimised Unary Encoding (OUE)
             index_mapper: Optional function - maps data items to indexes in the range {0, 1, ..., d-1} where d is the size of the data domain
         """
-        super().__init__(epsilon, d, index_mapper)
+        super().__init__(epsilon, d, index_mapper=index_mapper)
 
         const = math.pow(math.e, self.epsilon/2)
         self.p = const / (const + 1)
@@ -32,7 +32,7 @@ class UEClient(FreqOracleClient):
         Used internally to peturb data using unary encoding
 
         Args:
-            index: the index corresponding the data item
+            index: the index corresponding to the data item
 
         Returns: privatised data vector
 
@@ -41,7 +41,7 @@ class UEClient(FreqOracleClient):
         oh_vec[index] = np.random.choice([1, 0], p=[self.p, 1-self.p]) # If entry is 1, keep as 1 with prob p
         return oh_vec
 
-    def privatise(self, data):
+    def privatise(self, data, **kwargs):
         """
         Privatises a user's data item using unary encoding.
 

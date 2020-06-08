@@ -30,7 +30,7 @@ class HEClient(FreqOracleClient):
         noisy_vec = oh_vec + noise
         return noisy_vec
 
-    def privatise(self, data):
+    def privatise(self, data, **kwargs):
         """
         Used to privatise a user's data using histogram encoding (Laplace mechanism)
 

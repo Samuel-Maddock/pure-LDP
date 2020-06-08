@@ -32,7 +32,7 @@ class LHServer(FreqOracleServer):
 
         self.p = math.exp(self.epsilon) / (math.exp(self.epsilon) + self.g - 1)
 
-    def aggregate(self, priv_data, seed):
+    def aggregate(self, priv_data, **kwargs):
         """
         Aggregates privatised data from UEClient to be used to calculate frequency estimates.
 
@@ -40,6 +40,8 @@ class LHServer(FreqOracleServer):
             priv_data: Privatised data of the form returned from UEClient.privatise
             seed: The seed of the user's hash function
         """
+        seed = kwargs.get("seed", 1)
+
         for i in range(0, self.d):
             if priv_data == (xxhash.xxh32(str(i), seed=seed).intdigest() % self.g):
                 self.aggregated_data[i] += 1

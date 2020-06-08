@@ -18,7 +18,7 @@ class LHClient(FreqOracleClient):
             use_olh: Optional boolean - if set to true uses Optimised Local Hashing (OLH) i.e g is set to round(e^epsilon + 1)
             index_mapper: Optional function - maps data items to indexes in the range {0, 1, ..., d-1} where d is the size of the data domain
         """
-        super().__init__(epsilon, d, index_mapper)
+        super().__init__(epsilon, d, index_mapper=index_mapper)
         self.g = g
 
         if use_olh is True:
@@ -59,7 +59,7 @@ class LHClient(FreqOracleClient):
 
         return y
 
-    def privatise(self, data, seed):
+    def privatise(self, data, **kwargs):
         """
         Privatises a user's data using local hashing.
 
@@ -70,4 +70,5 @@ class LHClient(FreqOracleClient):
         Returns:
             privatised data: a single integer
         """
+        seed = kwargs.get("seed", 1)
         return self._perturb(data, seed)
