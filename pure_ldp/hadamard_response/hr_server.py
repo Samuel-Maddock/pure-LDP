@@ -11,10 +11,14 @@ class HadamardResponseServer(FreqOracleServer):
         self.set_name("Hadamard Response")
 
     def aggregate(self, data, **kwargs):
-        self.aggregated_data = np.append(self.aggregated_data, [data])
+        self.aggregated_data = np.append(self.aggregated_data, data)
         self.n +=1
+
+    def estimate_all(self):
+        self.estimated_data = self.hr.decode_string(self.aggregated_data) * self.n
+        return self.estimated_data
 
     def estimate(self, data, suppress_warnings=False):
         index = self.index_mapper(data)
-        self.estimated_data = self.hr.decode_string(self.aggregated_data) * self.n
+        self.estimate_all()
         return self.estimated_data[index]

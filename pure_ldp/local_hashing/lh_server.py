@@ -44,6 +44,13 @@ class LHServer(FreqOracleServer):
                 self.aggregated_data[i] += 1
         self.n += 1
 
+    def estimate_all(self):
+        a = self.g / (self.p * self.g - 1)
+        b = self.n / (self.p * self.g - 1)
+
+        self.estimated_data = a * self.aggregated_data - b
+        return self.estimated_data
+
     def estimate(self, data, suppress_warnings=False):
         """
         Calcualtes a frequency estimate of the given data item using the aggregated data.
@@ -56,12 +63,8 @@ class LHServer(FreqOracleServer):
 
         """
         self.check_warnings(suppress_warnings=suppress_warnings)
-
-        a = self.g / (self.p * self.g - 1)
-        b = self.n / (self.p * self.g - 1)
-
-        self.estimated_data = a * self.aggregated_data - b
         index = self.index_mapper(data)
+        self.estimate_all()
         return self.estimated_data[index]
 
         # def aggregate(self, priv_data, seed):

@@ -61,4 +61,10 @@ class FreqOracleServer:
         assert ("Must implement")
 
     def estimate(self, data, suppress_warnings=False):
-        assert ("Must implement")
+        assert("Must implement")
+
+    def estimate_all(self):
+        assert("Must implement")
+
+    def get_estimates(self):
+        return self.estimated_data
