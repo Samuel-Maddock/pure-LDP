@@ -49,7 +49,7 @@ class HEServer(FreqOracleServer):
 
         return round(float(fminbound(var, 0.5, 1)), 4)
 
-    def aggregate(self, priv_data, **kwargs):
+    def aggregate(self, priv_data):
         """
         Aggregates HE privatised data, to allow us to calculate estimates.
 

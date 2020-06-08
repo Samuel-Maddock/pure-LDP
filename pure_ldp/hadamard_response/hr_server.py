@@ -10,7 +10,7 @@ class HadamardResponseServer(FreqOracleServer):
         self.hr = k2k_hadamard.Hadamard_Rand_high_priv(self.k, self.epsilon)
         self.set_name("Hadamard Response")
 
-    def aggregate(self, data, **kwargs):
+    def aggregate(self, data):
         self.aggregated_data = np.append(self.aggregated_data, data)
         self.n +=1
 
@@ -19,6 +19,7 @@ class HadamardResponseServer(FreqOracleServer):
         return self.estimated_data
 
     def estimate(self, data, suppress_warnings=False):
+        self.check_warnings(suppress_warnings)
         index = self.index_mapper(data)
         self.estimate_all()
         return self.estimated_data[index]

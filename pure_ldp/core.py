@@ -57,7 +57,7 @@ class FreqOracleServer:
                 warnings.warn("High privacy has been detected (epsilon = " + str(self.epsilon) +
                               "), estimations may be highly inaccurate on small datasets", RuntimeWarning)
 
-    def aggregate(self, data, **kwargs):
+    def aggregate(self, data):
         assert ("Must implement")
 
     def estimate(self, data, suppress_warnings=False):

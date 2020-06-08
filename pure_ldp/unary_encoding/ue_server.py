@@ -24,7 +24,7 @@ class UEServer(FreqOracleServer):
             self.q = 1/(math.pow(math.e, self.epsilon) + 1)
 
 
-    def aggregate(self, priv_data, **kwargs):
+    def aggregate(self, priv_data):
         """
         Used to aggregate privatised data by ue_client.privatise
 

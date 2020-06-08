@@ -15,14 +15,8 @@
 
 # This is a package for locally private data transmission. 
 
-
-#%matplotlib inline
-import math
-import numpy as np
 import random
-import matplotlib.pyplot as plt
 from pure_ldp.hadamard_response.internal.functions import *
-
 
 #the Hadamard randamized responce when \epsilon < 1
 class Hadamard_Rand_high_priv:

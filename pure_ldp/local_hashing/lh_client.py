@@ -71,4 +71,4 @@ class LHClient(FreqOracleClient):
             privatised data: a single integer
         """
         seed = kwargs.get("seed", 1)
-        return self._perturb(data, seed)
+        return self._perturb(data, seed), seed
