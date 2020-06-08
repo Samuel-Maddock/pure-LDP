@@ -41,7 +41,7 @@ class UEClient(FreqOracleClient):
         oh_vec[index] = np.random.choice([1, 0], p=[self.p, 1-self.p]) # If entry is 1, keep as 1 with prob p
         return oh_vec
 
-    def privatise(self, data, **kwargs):
+    def privatise(self, data):
         """
         Privatises a user's data item using unary encoding.
 

@@ -17,7 +17,7 @@ class FreqOracleClient:
     def _peturb(self, data):
         assert("Must Implement")
 
-    def privatise(self, data, **kwargs):
+    def privatise(self, data):
         assert("Must Implement")
 
 

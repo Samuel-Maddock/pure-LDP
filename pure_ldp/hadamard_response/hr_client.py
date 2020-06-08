@@ -11,6 +11,6 @@ class HadamardResponseClient(FreqOracleClient):
     def _peturb(self, data):
         return self.hr.encode_symbol(data)
 
-    def privatise(self, data, **kwargs):
+    def privatise(self, data):
         index = self.index_mapper(data)
         return self._peturb(index)
