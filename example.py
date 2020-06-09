@@ -98,20 +98,23 @@ print("HR Estimates:", hr_estimates)
 print("Note: We round estimates to the nearest integer")
 
 
-# Uncomment to run PEM code
+# ----- PEM Simulation -----
 
-# pem_client = PEMClient(epsilon=3, domain_size=6, start_length=2, segment_length=2)
-# pem_server = PEMServer(epsilon=3, domain_size=6, start_length=2, segment_length=2)
-#
-# s1 = "101101"
-# s2 = "111111"
-# s3 = "100000"
-# s4 = "101100"
-#
-# data = np.concatenate(([s1]*8000, [s2]*4000, [s3]*1000, [s4]*500))
-#
-# for index,item in enumerate(data):
-#     pem_server.aggregate(*pem_client.privatise(item, index), index)
-#
-#
-# print(pem_server.find_top_k(3))
+pem_client = PEMClient(epsilon=3, domain_size=6, start_length=2, segment_length=2)
+pem_server = PEMServer(epsilon=3, domain_size=6, start_length=2, segment_length=2)
+
+
+s1 = "101101"
+s2 = "111111"
+s3 = "100000"
+s4 = "101100"
+
+print("\nRunning Prefix Extending Method (PEM) to find heavy hitters")
+print("Finding top 3 strings, where the alphabet is:", s1,s2,s3,s4)
+
+data = np.concatenate(([s1]*8000, [s2]*4000, [s3]*1000, [s4]*500))
+
+for index,item in enumerate(data):
+    pem_server.aggregate(*pem_client.privatise(item))
+
+print("Top 3 strings found are:", pem_server.find_top_k(3))

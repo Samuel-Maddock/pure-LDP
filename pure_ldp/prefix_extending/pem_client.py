@@ -13,11 +13,11 @@ class PEMClient:
         self.start_length = start_length
 
         self.g = math.ceil((self.domain_size-self.start_length)/self.segment_length)
-        self.client = LHClient(self.epsilon, use_olh=True)
+        self.client = LHClient(self.epsilon, d=None, use_olh=True)
 
-    def privatise(self, bit_string, seed):
+    def privatise(self, bit_string):
         group = random.randint(0,self.g-1)
         fragment_size = self.start_length + (group+1)*self.segment_length
         fragment = bit_string[0:min(fragment_size, len(bit_string))]
         num = BitArray(bin=fragment).uint
-        return self.client.privatise(num, seed), group
+        return self.client.privatise(num), group

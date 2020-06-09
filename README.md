@@ -51,7 +51,7 @@ print(server_olh.estimate(1)) # Should be approximately 4000 +- 200
 
 ```
 
-Checkout [example.py](https://github.com/Samuel-Maddock/pure-LDP/blob/master/example.py) for more examples.
+See [example.py](https://github.com/Samuel-Maddock/pure-LDP/blob/master/example.py) for more examples.
 
 ## Acknowledgements
 

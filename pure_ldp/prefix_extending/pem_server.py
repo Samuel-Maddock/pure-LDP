@@ -20,15 +20,20 @@ class PEMServer:
             self.oracles.append(
                 LHServer(self.epsilon, 2 ** (self.start_length + (i + 1) * self.segment_length), use_olh=True))
 
-    def aggregate(self, privatised_fragment, group, seed):
-        self.oracles[group].aggregate(privatised_fragment, seed)
+    def aggregate(self, privatised_fragment, group):
+        self.oracles[group].aggregate(privatised_fragment)
+
+    def _estimate_top_k(self, oracle, candidates, k):
+        # TODO: Faster/nicer way to do this?
+        top_k, _ = zip(*Counter(dict(zip(candidates, oracle.estimate_all(candidates, suppress_warnings=True)))).most_common(k))
+        return top_k
 
     def find_top_k(self, k):
         fragment_size = self.start_length + (0 + 1) * self.segment_length
         candidates = range(0, 2 ** fragment_size)
-        top_k = dict(Counter(dict(map(lambda x: (x, self.oracles[0].estimate(x)), candidates))).most_common(4))
+        top_k = self._estimate_top_k(self.oracles[0], candidates, k)
 
-        freq_candidates = list(map(lambda x: BitArray(uint=x, length=fragment_size).bin, top_k.keys()))
+        freq_candidates = list(map(lambda x: BitArray(uint=x, length=fragment_size).bin, top_k))
 
         for i in range(1, self.g):
             fragment_size = self.start_length + (i + 1) * self.segment_length
@@ -39,8 +44,8 @@ class PEMServer:
             for frag in frags:
                 candidates.extend([BitArray(bin=bs + frag).uint for bs in freq_candidates])
 
-            top_k = dict(Counter(dict(map(lambda x: (x, self.oracles[i].estimate(x)), candidates))).most_common(k))
+            top_k = self._estimate_top_k(self.oracles[i], candidates, k)
 
-            freq_candidates = list(map(lambda x: BitArray(uint=x, length=fragment_size).bin, top_k.keys()))
+            freq_candidates = list(map(lambda x: BitArray(uint=x, length=fragment_size).bin, top_k))
 
         return freq_candidates
