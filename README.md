@@ -9,6 +9,9 @@ The package has implementations of all three main techniques:
 2. (Summation/Thresholding) Histogram encoding - Under ```pure_ldp.histogram_encoding.he_client``` and ```pure_ldp.histogram_encoding.he_sever``` 
 3. (Optimal) Local Hashing - Under ```pure_ldp.local_hashing.lh_client``` and ```pure_ldp.local_hashing.lh_server``` 
 
+The package also includes an implementation of the heavy hitter algorithm Prefix Extending Method (PEM)
+* This is under ```pure_ldp.prefix_extending.pem_client``` and ```pure_ldp.prefix_extending.pem_server```
+
 There is also support for the frequency oracle Hadamard Response, the code implemented for this is simply a pure-LDP wrapper of [hadamard_response](https://github.com/zitengsun/hadamard_response)
 * This is under ```pure_ldp.hadamard_response.hr_client``` and ```pure_ldp.hadamard_response.hr_server```
 ## Installation
@@ -18,7 +21,10 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install.
 ```bash
 pip install pure-ldp
 ```
-
+To upgrade to the [latest version](https://pypi.org/project/pure-ldp/)
+```bash
+pip install pure-ldp --upgrade
+```
 Requires numpy, scipy, xxhash, bitarray and bitstring
 
 ## Usage
