@@ -3,4 +3,4 @@ __pycache__
 build
 dist
 pure_ldp.egg-info
-spare_code.py
+development

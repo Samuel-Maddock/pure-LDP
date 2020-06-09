@@ -1,14 +1,16 @@
 import numpy as np
 import math
 import xxhash
-
+from sys import maxsize
+import random
+from pure_ldp.core import FreqOracleClient
 
 # Client-side for local-hashing
 
 # Very loosely based on code by Wang (https://github.com/vvv214/LDP_Protocols/blob/master/olh.py)
 
-class LHClient:
-    def __init__(self, epsilon, g=2, use_olh=False, index_mapper=None):
+class LHClient(FreqOracleClient):
+    def __init__(self, epsilon, d, g=2, use_olh=False, index_mapper=None):
         """
 
         Args:
@@ -17,7 +19,7 @@ class LHClient:
             use_olh: Optional boolean - if set to true uses Optimised Local Hashing (OLH) i.e g is set to round(e^epsilon + 1)
             index_mapper: Optional function - maps data items to indexes in the range {0, 1, ..., d-1} where d is the size of the data domain
         """
-        self.epsilon = epsilon
+        super().__init__(epsilon, d, index_mapper=index_mapper)
         self.g = g
 
         if use_olh is True:
@@ -26,12 +28,7 @@ class LHClient:
         self.p = math.exp(self.epsilon) / (math.exp(self.epsilon) + self.g - 1)
         self.q = 1.0 / (math.exp(self.epsilon) + self.g - 1)
 
-        if index_mapper is None:
-            self.index_mapper = lambda x: x - 1 # By default, we assume the data is integers from {1,...,d} and hence index as {0,..., d-1}
-        else:
-            self.index_mapper = index_mapper
-
-    def __perturb(self, data, seed):
+    def _perturb(self, data, seed):
         """
         Used internally to perturb data using local hashing.
 
@@ -63,15 +60,15 @@ class LHClient:
 
         return y
 
-    def privatise(self, data, seed):
+    def privatise(self, data):
         """
         Privatises a user's data using local hashing.
 
         Args:
             data: The data to be privatised
-            seed: The seed for that user's hash function, a seed should be uniquely assigned to every user
 
         Returns:
             privatised data: a single integer
         """
-        return self.__perturb(data, seed)
+        seed = random.randint(0,maxsize) # This is sys.maxsize
+        return self._perturb(data, seed), seed
