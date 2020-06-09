@@ -7,6 +7,9 @@ from pure_ldp.local_hashing.lh_server import LHServer
 from pure_ldp.histogram_encoding.he_client import HEClient
 from pure_ldp.histogram_encoding.he_server import HEServer
 
+from pure_ldp.hadamard_response.hr_client import HadamardResponseClient
+from pure_ldp.hadamard_response.hr_server import HadamardResponseServer
+
 from pure_ldp.prefix_extending.pem_client import PEMClient
 from pure_ldp.prefix_extending.pem_server import PEMServer
 
@@ -26,7 +29,7 @@ is_oue = True
 is_olh = True
 
 # Optimal Local Hashing (OLH)
-client_olh = LHClient(epsilon=epsilon, use_olh=True)
+client_olh = LHClient(epsilon=epsilon, d=d, use_olh=True)
 server_olh = LHServer(epsilon=epsilon, d=d, use_olh=True)
 
 # Optimal Unary Encoding (OUE)
@@ -37,32 +40,45 @@ server_oue = UEServer(epsilon=epsilon, d=d, use_oue=True)
 client_the = HEClient(epsilon=epsilon, d=d)
 server_the = HEServer(epsilon=epsilon, d=d, use_the=is_the)
 
+# Hadamard Response (HR)
+client_hr = HadamardResponseClient(epsilon, d)
+server_hr = HadamardResponseServer(epsilon, d)
+
 # Simulate client-side privatisation + server-side aggregation
-for index, item in enumerate(data):
-    priv_olh_data = client_olh.privatise(item, index)
+for item in data:
+    priv_olh_data = client_olh.privatise(item)
     priv_oue_data = client_oue.privatise(item)
     priv_the_data = client_the.privatise(item)
+    priv_hr_data = client_hr.privatise(item)
 
-    server_olh.aggregate(priv_olh_data, index)
+    server_olh.aggregate(priv_olh_data)
     server_oue.aggregate(priv_oue_data)
     server_the.aggregate(priv_the_data)
+    server_hr.aggregate(priv_hr_data)
+
+# Note instead, we could use server.aggregate_all(list_of_privatised_data)
 
 # Simulate server-side estimation
 oue_estimates = []
 olh_estimates = []
 the_estimates = []
-mse_arr = np.zeros(3)
+hr_estimates = []
+mse_arr = np.zeros(4)
 
 for i in range(0, d):
     olh_estimates.append(round(server_olh.estimate(i+1)))
     oue_estimates.append(round(server_oue.estimate(i+1)))
     the_estimates.append(round(server_the.estimate(i+1)))
+    hr_estimates.append(round(server_hr.estimate(i+1)))
+
+# Note in the above we could do server.estimate_all(range(1, d+1)) to save looping
 
 # Calculate variance
 for i in range(0,d):
     mse_arr[0] += (olh_estimates[i] - original_freq[i])**2
     mse_arr[1] += (oue_estimates[i] - original_freq[i])**2
     mse_arr[2] += (the_estimates[i] - original_freq[i])**2
+    mse_arr[3] += (hr_estimates[i] - original_freq[i])**2
 
 mse_arr = mse_arr/d
 
@@ -72,11 +88,13 @@ print("Experiment run on a dataset of size", len(data), "with d=",d, "and epsilo
 print("Optimised Local Hashing (OLH) Variance: ", mse_arr[0])
 print("Optimised Unary Encoding (OUE) Variance: ", mse_arr[1])
 print("Threshold Histogram Encoding (THE) Variance: ", mse_arr[2])
+print("Hadamard response (HR) Variance:", mse_arr[3])
 print("\n")
 print("Original Frequencies:", original_freq)
 print("OLH Estimates:", olh_estimates)
 print("OUE Estimates:", oue_estimates)
 print("THE Estimates:", the_estimates)
+print("HR Estimates:", hr_estimates)
 print("Note: We round estimates to the nearest integer")
 
 

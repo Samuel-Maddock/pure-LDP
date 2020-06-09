@@ -7,7 +7,7 @@ setup(
     name='pure-ldp',
     version='1.0.1',
     packages=find_packages(),
-    install_requires=["xxhash", "numpy", "scipy", "bitstring"],
+    install_requires=["xxhash", "numpy", "scipy", "bitstring", "bitarray"],
     url='https://github.com/Samuel-Maddock/pure-LDP',
     license='',
     author='Samuel Maddock',

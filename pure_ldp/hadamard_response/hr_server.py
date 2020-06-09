@@ -1,7 +1,6 @@
 from pure_ldp.core import FreqOracleServer
 from pure_ldp.hadamard_response.internal import k2k_hadamard
 import math
-import numpy as np
 
 
 class HadamardResponseServer(FreqOracleServer):
