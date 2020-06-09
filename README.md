@@ -3,11 +3,14 @@
 pure-LDP is a Python package that provides simple implementations of pure LDP frequency oracles detailed in the paper 
 ["Locally Differentially Private Protocols for Frequency Estimation"](https://www.usenix.org/conference/usenixsecurity17/technical-sessions/presentation/wang-tianhao) by Wang et al
 
-The package has implementations of all three main techniques:
-1. Unary Encoding - Under ```pure_ldp.unary_encoding.ue_client``` and ```pure_ldp.unary_encoding.ue_server``` 
-2. Histogram encoding - Under ```pure_ldp.histogram_encoding.he_client``` and ```pure_ldp.histogram_encoding.he_sever``` 
-3. Local Hashing - Under ```pure_ldp.local_hashing.lh_client``` and ```pure_ldp.local_hashing.lh_server``` 
 
+The package has implementations of all three main techniques:
+1. (Optimal) Unary Encoding - Under ```pure_ldp.unary_encoding.ue_client``` and ```pure_ldp.unary_encoding.ue_server``` 
+2. (Summation/Thresholding) Histogram encoding - Under ```pure_ldp.histogram_encoding.he_client``` and ```pure_ldp.histogram_encoding.he_sever``` 
+3. (Optimal) Local Hashing - Under ```pure_ldp.local_hashing.lh_client``` and ```pure_ldp.local_hashing.lh_server``` 
+
+There is also support for the frequency oracle Hadamard Response, the code implemented for this is simply a pure-LDP wrapper of [hadamard_response](https://github.com/zitengsun/hadamard_response)
+* This is under ```pure_ldp.hadamard_response.hr_client``` and ```pure_ldp.hadamard_response.hr_server```
 ## Installation
 
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install.
@@ -16,7 +19,7 @@ Use the package manager [pip](https://pip.pypa.io/en/stable/) to install.
 pip install pure-ldp
 ```
 
-Requires numpy, scipy and xxhash.
+Requires numpy, scipy, xxhash, bitarray and bitstring
 
 ## Usage
 
@@ -30,29 +33,30 @@ from pure-ldp.local_hashing.lh_server import LHServer
 epsilon = 3 # Privacy budget of 3
 d = 4 # For simplicity, we use a dataset with 4 possible data items
 
-client_olh = LHClient(epsilon=epsilon, use_olh=True)
+client_olh = LHClient(epsilon=epsilon, d=d, use_olh=True)
 server_olh = LHServer(epsilon=epsilon, d=d, use_olh=True)
 
 # Test dataset, every user has a number between 1-4, 10,000 users total
 data = np.concatenate(([1]*4000, [2]*3000, [3]*2000, [4]*1000))
 
-for index, item in enumerate(data):
-    # Simulate client-side process
-    priv_data = client_olh.privatise(item, index) # We use the user's index as a hash seed, in practice this should be randomly+uniquely generated
+for item in data:
+    # Simulate client-side privatisation
+    priv_data = client_olh.privatise(item)
 
     # Simulate server-side aggregation
-    server_olh.aggregate(priv_data, index)
+    server_olh.aggregate(priv_data)
 
 # Simulate server-side estimation
-print(server_olh.estimate(1)) # Should be approximately 4000 +- 100
+print(server_olh.estimate(1)) # Should be approximately 4000 +- 200
 
 ```
 
 Checkout [example.py](https://github.com/Samuel-Maddock/pure-LDP/blob/master/example.py) for more examples.
 
-## TODO
-1. More documentation
-2. Implementation of PEM
+## Acknowledgements
+
+1. Some OLH code is based on the implementation by [Tianhao Wang](https://github.com/vvv214): [repo](https://github.com/vvv214/LDP_Protocols/blob/master/olh.py)
+2. The Hadamard Response code is just a wrapper of the k2khadamard.py code in the repo [hadamard_response](https://github.com/zitengsun/hadamard_response) by [Ziteng Sun](https://github.com/zitengsun)
 
 ## Contributing
 If you feel like this package could be improved in any way, open an issue or make a pull request!
