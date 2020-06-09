@@ -67,7 +67,7 @@ class HEServer(FreqOracleServer):
         self.aggregated_data += priv_data
         self.n += 1
 
-    def estimate_all(self):
+    def _update_estimates(self):
         self.estimated_data = self.aggregated_data
         if self.is_the:
             self.estimated_data = (self.aggregated_data - self.n * self.q) / (self.p - self.q)
@@ -86,5 +86,5 @@ class HEServer(FreqOracleServer):
         """
         self.check_warnings(suppress_warnings=suppress_warnings)
         index = self.index_mapper(data)
-        self.estimate_all()
+        self.check_and_update_estimates()
         return self.estimated_data[index]

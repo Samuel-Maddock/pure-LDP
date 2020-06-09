@@ -45,7 +45,7 @@ class LHServer(FreqOracleServer):
                 self.aggregated_data[i] += 1
         self.n += 1
 
-    def estimate_all(self):
+    def _update_estimates(self):
         a = self.g / (self.p * self.g - 1)
         b = self.n / (self.p * self.g - 1)
 
@@ -65,7 +65,7 @@ class LHServer(FreqOracleServer):
         """
         self.check_warnings(suppress_warnings=suppress_warnings)
         index = self.index_mapper(data)
-        self.estimate_all()
+        self.check_and_update_estimates()
         return self.estimated_data[index]
 
         # def aggregate(self, priv_data, seed):
