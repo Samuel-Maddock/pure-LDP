@@ -16,6 +16,20 @@ class HadamardResponseClient(FreqOracleClient):
         self.k = math.ceil(2 ** (math.log(d, 2))) # k must be a power of 2 for hadamard, so we round d to nearest power
         self.hr = k2k_hadamard.Hadamard_Rand_high_priv(self.k, self.epsilon) # hadamard_response
 
+    def update_params(self, epsilon=None, d=None, index_mapper=None):
+        """
+        Updates HR client-side params
+        Args:
+            epsilon: optional - privacy budget
+            d: optional - domain size
+            index_mapper: optional - function
+        """
+        super().update_params(epsilon, d, index_mapper)
+
+        if d is not None or epsilon is not None:
+            self.k = math.ceil(2 ** (math.log(self.d, 2))) # k must be a power of 2 for hadamard, so we round d to nearest power
+            self.hr = k2k_hadamard.Hadamard_Rand_high_priv(self.k, self.epsilon) # hadamard_response
+
     def _perturb(self, data):
         """
         Used internally to perturb data

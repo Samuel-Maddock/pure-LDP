@@ -20,10 +20,23 @@ class HadamardResponseServer(FreqOracleServer):
 
     def reset(self):
         """
-        Resets aggregated/estimated data to allow new collection
+        Resets aggregated/estimated data to allow for new collection/aggregation
         """
         super().reset()
         self.aggregated_data = [] # For Hadamard response, aggregated data is stored in a list not numpy array
+
+    def update_params(self, epsilon=None, d=None, index_mapper=None):
+        """
+        Updates HR Server parameters, will reset aggregated/estimated data.
+        Args:
+            epsilon: optional - privacy budget
+            d: optional - domain size
+            index_mapper: optional - function
+        """
+        super().update_params(epsilon, d, index_mapper)
+        if d is not None or epsilon is not None:
+            self.k = math.ceil(2 ** (math.log(self.d, 2)))
+            self.hr = k2k_hadamard.Hadamard_Rand_high_priv(self.k, self.epsilon)
 
     def aggregate(self, data):
         """

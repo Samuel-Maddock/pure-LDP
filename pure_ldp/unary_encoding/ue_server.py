@@ -14,14 +14,26 @@ class UEServer(FreqOracleServer):
         """
         super().__init__(epsilon, d, index_mapper=index_mapper)
         self.set_name("UEServer")
+        self.use_oue = use_oue
+        self.update_params(epsilon, d, index_mapper)
 
-        const = math.pow(math.e, self.epsilon/2)
-        self.p = const / (const + 1)
-        self.q = 1-self.p
+    def update_params(self, epsilon=None, d=None, index_mapper=None):
+        """
+        Updates UE server parameters. This will reset any aggregated/estimated data
+        Args:
+            epsilon: optional - privacy budget
+            d: optional - domain size
+            index_mapper: optional - index_mapper
+        """
+        super().update_params(epsilon, d, index_mapper)
+        if epsilon is not None:
+            const = math.pow(math.e, self.epsilon / 2)
+            self.p = const / (const + 1)
+            self.q = 1 - self.p
 
-        if use_oue is True:
-            self.p = 0.5
-            self.q = 1/(math.pow(math.e, self.epsilon) + 1)
+            if self.use_oue is True:
+                self.p = 0.5
+                self.q = 1 / (math.pow(math.e, self.epsilon) + 1)
 
     def aggregate(self, priv_data):
         """
@@ -34,7 +46,7 @@ class UEServer(FreqOracleServer):
         self.n += 1
 
     def _update_estimates(self):
-        self.estimated_data = (self.aggregated_data - self.n*self.q)/(self.p-self.q)
+        self.estimated_data = (self.aggregated_data - self.n * self.q) / (self.p - self.q)
         return self.estimated_data
 
     def estimate(self, data, suppress_warnings=False):
@@ -52,4 +64,3 @@ class UEServer(FreqOracleServer):
         index = self.index_mapper(data)
         self.check_and_update_estimates()
         return self.estimated_data[index]
-

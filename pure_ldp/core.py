@@ -22,6 +22,18 @@ class FreqOracleClient:
         else:
             self.index_mapper = index_mapper
 
+    def update_params(self, epsilon=None, d=None, index_mapper=None):
+        """
+        Method to update params of freq oracle client, should be overridden if more options needed.
+        Args:
+            epsilon: Optional - privacy budget
+            d: Optional - domain size
+            index_mapper: Optional - function
+        """
+        self.epsilon = epsilon if epsilon is not None else self.epsilon
+        self.d = d if d is not None else self.d
+        self.index_mapper = index_mapper if index_mapper is not None else self.index_mapper
+
     def _perturb(self, data):
         """
         Used internally to peturb raw data, must be implemented by a FreqOracle
@@ -79,19 +91,24 @@ class FreqOracleServer:
         """
         self.aggregated_data = np.zeros(self.d)
         self.estimated_data = []
+        self.last_estimated = 0
         self.n = 0
 
     def update_params(self, epsilon=None, d=None, index_mapper=None):
         """
         Method to update params of freq oracle server, should be overridden if more options needed.
+        This will reset aggregated/estimated data.
         Args:
             epsilon: Optional - privacy budget
             d: Optional - domain size
             index_mapper: Optional - function
         """
-        self.epsilon = epsilon if epsilon is not None else self.epsilon
+        self.epsilon = epsilon if epsilon is not None else self.epsilon # Updating epsilon here will not update any internal probabilities
+        # Any class that implements FreqOracleServer, needs to override update_params to update epsilon properly
+
         self.d = d if d is not None else self.d
         self.index_mapper = index_mapper if index_mapper is not None else self.index_mapper
+        self.reset()
 
     def check_warnings(self, suppress_warnings=False):
         """
