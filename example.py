@@ -100,8 +100,20 @@ print("Note: We round estimates to the nearest integer")
 
 # ----- PEM Simulation -----
 
-pem_client = PEMClient(epsilon=3, domain_size=6, start_length=2, segment_length=2)
-pem_server = PEMServer(epsilon=3, domain_size=6, start_length=2, segment_length=2)
+from pure_ldp.development.apple_cms.cms_sever import CMSServer
+from pure_ldp.development.apple_cms.cms_client import CMSClient
+
+from pure_ldp.development.explicit_hist.eh_server import ExplicitHistServer
+from pure_ldp.development.explicit_hist.eh_client import ExplicitHistClient
+
+cms_server = CMSServer(3, 2, 2048)
+cms_client = CMSClient(3, cms_server.get_hash_funcs(), 2048)
+
+hashto_server = ExplicitHistServer(3, d=d)
+hashto_client = ExplicitHistClient(3, d=d)
+
+pem_client = PEMClient(epsilon=3, domain_size=6, start_length=2, segment_length=2, FOClient=hashto_client)
+pem_server = PEMServer(epsilon=3, domain_size=6, start_length=2, segment_length=2, FOServer=hashto_server)
 
 
 s1 = "101101"
@@ -115,6 +127,8 @@ print("Finding top 3 strings, where the alphabet is:", s1,s2,s3,s4)
 data = np.concatenate(([s1]*8000, [s2]*4000, [s3]*1000, [s4]*500))
 
 for index,item in enumerate(data):
-    pem_server.aggregate(*pem_client.privatise(item))
+    priv = pem_client.privatise(item)
+    pem_server.aggregate(*priv)
 
-print("Top 3 strings found are:", pem_server.find_top_k(3))
+top_k = pem_server.find_top_k(3)
+print("Top 3 strings found are:", top_k)

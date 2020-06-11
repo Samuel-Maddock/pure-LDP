@@ -20,13 +20,29 @@ class LHClient(FreqOracleClient):
             index_mapper: Optional function - maps data items to indexes in the range {0, 1, ..., d-1} where d is the size of the data domain
         """
         super().__init__(epsilon, d, index_mapper=index_mapper)
-        self.g = g
+        self.use_olh = use_olh
+        self.g =g
+        self.update_params(epsilon, d, g, index_mapper)
 
-        if use_olh is True:
+    def update_params(self, epsilon=None, d=None, g=None, index_mapper=None):
+        """
+
+        Args:
+            epsilon: optional - privacy budget
+            d: optional - domain size
+            g: optional - hash domain
+            index_mapper: optional - function
+        """
+        super().update_params(epsilon, d, index_mapper) # Updates core params
+
+        # Updates g and probs
+        self.g = g if g is not None else self.g
+        if self.use_olh is True:
             self.g = int(round(math.exp(self.epsilon))) + 1
 
-        self.p = math.exp(self.epsilon) / (math.exp(self.epsilon) + self.g - 1)
-        self.q = 1.0 / (math.exp(self.epsilon) + self.g - 1)
+        if self.epsilon is not None or self.g is not None:
+            self.p = math.exp(self.epsilon) / (math.exp(self.epsilon) + self.g - 1)
+            self.q = 1.0 / (math.exp(self.epsilon) + self.g - 1)
 
     def _perturb(self, data, seed):
         """

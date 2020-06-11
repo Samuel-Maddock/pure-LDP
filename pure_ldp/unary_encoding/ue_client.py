@@ -18,14 +18,27 @@ class UEClient(FreqOracleClient):
             index_mapper: Optional function - maps data items to indexes in the range {0, 1, ..., d-1} where d is the size of the data domain
         """
         super().__init__(epsilon, d, index_mapper=index_mapper)
+        self.use_oue = use_oue
+        self.update_params(epsilon, d, index_mapper)
 
-        const = math.pow(math.e, self.epsilon/2)
-        self.p = const / (const + 1)
-        self.q = 1-self.p
+    def update_params(self, epsilon=None, d=None, index_mapper=None):
+        """
+        Used to update the client UE parameters.
+        Args:
+            epsilon: optional - privacy budget
+            d: optional - domain size
+            index_mapper:  optional - function
+        """
+        super().update_params(epsilon, d, index_mapper)
 
-        if use_oue is True:
-            self.p = 0.5
-            self.q = 1/(math.pow(math.e, self.epsilon) + 1)
+        if epsilon is not None: # If epsilon changes, update probs
+            const = math.pow(math.e, self.epsilon/2)
+            self.p = const / (const + 1)
+            self.q = 1-self.p
+
+            if self.use_oue is True:
+                self.p = 0.5
+                self.q = 1/(math.pow(math.e, self.epsilon) + 1)
 
     def _perturb(self, index):
         """

@@ -5,15 +5,15 @@ pure-LDP is a Python package that provides simple implementations of pure LDP fr
 
 
 The package has implementations of all three main techniques:
-1. (Optimal) Unary Encoding - Under ```pure_ldp.unary_encoding.ue_client``` and ```pure_ldp.unary_encoding.ue_server``` 
-2. (Summation/Thresholding) Histogram encoding - Under ```pure_ldp.histogram_encoding.he_client``` and ```pure_ldp.histogram_encoding.he_sever``` 
-3. (Optimal) Local Hashing - Under ```pure_ldp.local_hashing.lh_client``` and ```pure_ldp.local_hashing.lh_server``` 
+1. (Optimal) Unary Encoding - Under ```pure_ldp.unary_encoding``` 
+2. (Summation/Thresholding) Histogram encoding - Under ```pure_ldp.histogram_encoding``` 
+3. (Optimal) Local Hashing - Under ```pure_ldp.local_hashing```
 
 The package also includes an implementation of the heavy hitter algorithm Prefix Extending Method (PEM)
-* This is under ```pure_ldp.prefix_extending.pem_client``` and ```pure_ldp.prefix_extending.pem_server```
+* This is under ```pure_ldp.prefix_extending```
 
 There is also support for the frequency oracle Hadamard Response, the code implemented for this is simply a pure-LDP wrapper of [hadamard_response](https://github.com/zitengsun/hadamard_response)
-* This is under ```pure_ldp.hadamard_response.hr_client``` and ```pure_ldp.hadamard_response.hr_server```
+* This is under ```pure_ldp.hadamard_response```
 ## Installation
 
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install.
@@ -31,8 +31,8 @@ Requires numpy, scipy, xxhash, bitarray and bitstring
 
 ```python
 import numpy as np
-from pure-ldp.local_hashing.lh_client import LHClient
-from pure-ldp.local_hashing.lh_server import LHServer
+from pure-ldp.local_hashing import LHClient
+from pure-ldp.local_hashing import LHServer
 
 # Using Optimal Local Hashing (OLH)
 

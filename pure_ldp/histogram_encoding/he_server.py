@@ -29,7 +29,16 @@ class HEServer(FreqOracleServer):
             self.p = 1 - 0.5 * (math.pow(math.e, self.epsilon / 2 * (self.theta - 1)))
             self.q = 0.5 * (math.pow(math.e, -1 * self.theta * (self.epsilon / 2)))
 
-        self.__find_optimal_theta()
+    def update_params(self, epsilon=None, d=None, theta=None, index_mapper=None):
+        super().update_params(epsilon, d, index_mapper)
+
+        if self.is_the:
+            self.theta = theta
+            if theta is None:
+                self.theta = self.__find_optimal_theta()
+
+            self.p = 1 - 0.5 * (math.pow(math.e, self.epsilon / 2 * (self.theta - 1)))
+            self.q = 0.5 * (math.pow(math.e, -1 * self.theta * (self.epsilon / 2)))
 
     def __find_optimal_theta(self):
         """
