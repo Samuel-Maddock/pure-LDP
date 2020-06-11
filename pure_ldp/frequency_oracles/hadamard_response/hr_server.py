@@ -1,5 +1,5 @@
 from pure_ldp.core import FreqOracleServer
-from pure_ldp.hadamard_response.internal import k2k_hadamard
+from pure_ldp.frequency_oracles.hadamard_response.internal import k2k_hadamard
 import math
 
 

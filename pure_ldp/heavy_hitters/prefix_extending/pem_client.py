@@ -1,4 +1,4 @@
-from pure_ldp.local_hashing.lh_client import LHClient
+from pure_ldp.frequency_oracles.local_hashing.lh_client import LHClient
 from pure_ldp.core import FreqOracleClient
 
 import math

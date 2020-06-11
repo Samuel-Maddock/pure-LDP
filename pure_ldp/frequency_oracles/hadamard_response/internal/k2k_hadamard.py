@@ -16,7 +16,7 @@
 # This is a package for locally private data transmission. 
 
 import random
-from pure_ldp.hadamard_response.internal.functions import *
+from pure_ldp.frequency_oracles.hadamard_response.internal.functions import *
 
 #the Hadamard randamized responce when \epsilon < 1
 class Hadamard_Rand_high_priv:
