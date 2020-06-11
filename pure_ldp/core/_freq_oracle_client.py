@@ -34,7 +34,7 @@ class FreqOracleClient:
         Args:
             data: user's data item
         """
-        assert ("Must Implement")
+        raise NotImplementedError("Must implement")
 
     def privatise(self, data):
         """
@@ -42,4 +42,4 @@ class FreqOracleClient:
         Args:
             data: user's data item
         """
-        assert ("Must Implement")
+        raise NotImplementedError("Must implement")

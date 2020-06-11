@@ -80,7 +80,7 @@ class FreqOracleServer:
         Args:
             data: item to estimate frequency of
         """
-        assert ("Must implement")
+        raise NotImplementedError("Must implement")
 
     def aggregate_all(self, data_list):
         """
@@ -103,7 +103,7 @@ class FreqOracleServer:
         """
         Used internally to update estimates, should be implemented
         """
-        assert ("Must implement")
+        raise NotImplementedError("Must implement")
 
     def estimate(self, data, suppress_warnings=False):
         """
@@ -112,7 +112,7 @@ class FreqOracleServer:
             data: data to estimate the frequency warning of
             suppress_warnings: Optional boolean - if true suppresses warnings
         """
-        assert ("Must implement")
+        raise NotImplementedError("Must implement")
 
     def estimate_all(self, data_list, suppress_warnings=False):
         """
