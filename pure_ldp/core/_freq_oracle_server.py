@@ -1,55 +1,5 @@
-import numpy as np
 import warnings
-import xxhash
-
-
-# Contains base classes for client/server frequency oracles
-
-class FreqOracleClient:
-    def __init__(self, epsilon, d, index_mapper=None):
-        """
-
-        Args:
-            epsilon: privacy budget
-            d: domain size - not all freq oracles need this, so can be None
-            index_mapper: Optional function - maps data items to indexes in the range {0, 1, ..., d-1} where d is the size of the data domain
-        """
-        self.epsilon = epsilon
-        self.d = d
-
-        if index_mapper is None:
-            self.index_mapper = lambda x: x - 1
-        else:
-            self.index_mapper = index_mapper
-
-    def update_params(self, epsilon=None, d=None, index_mapper=None):
-        """
-        Method to update params of freq oracle client, should be overridden if more options needed.
-        Args:
-            epsilon: Optional - privacy budget
-            d: Optional - domain size
-            index_mapper: Optional - function
-        """
-        self.epsilon = epsilon if epsilon is not None else self.epsilon
-        self.d = d if d is not None else self.d
-        self.index_mapper = index_mapper if index_mapper is not None else self.index_mapper
-
-    def _perturb(self, data):
-        """
-        Used internally to peturb raw data, must be implemented by a FreqOracle
-        Args:
-            data: user's data item
-        """
-        assert ("Must Implement")
-
-    def privatise(self, data):
-        """
-        Public facing method to privatise user's data
-        Args:
-            data: user's data item
-        """
-        assert ("Must Implement")
-
+import numpy as np
 
 class FreqOracleServer:
     def __init__(self, epsilon, d, index_mapper=None):
@@ -183,40 +133,3 @@ class FreqOracleServer:
         Returns: Estimated data
         """
         return self.estimated_data
-
-# Helper funcs
-
-def generate_hash_funcs(k, m):
-    """
-    Generates k hash functions that map data to the range {0, 1,..., m-1}
-    Args:
-        k: The number of hash functions
-        m: The domain {0,1,...,m-1} that hash func maps too
-    Returns: List of k hash functions
-    """
-    hash_funcs = []
-    for i in range(0, k):
-        hash_funcs.append(generate_hash(m, i))
-    return hash_funcs
-
-
-def generate_256_hash():
-    """
-
-    Returns: A hash function that maps data to {0,1,... 255}
-
-    """
-    return lambda data: xxhash.xxh64(data, seed=10).intdigest() % 256
-
-
-def generate_hash(m, seed):
-    """
-    Generate a single hash function that maps data to {0, ... ,m-1}
-    Args:
-        m: int domain to map too
-        seed: int the seed for the hash function
-
-    Returns:
-
-    """
-    return lambda data: xxhash.xxh64(str(data), seed=seed).intdigest() % m
