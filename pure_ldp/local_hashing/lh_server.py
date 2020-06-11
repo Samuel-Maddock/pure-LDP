@@ -45,7 +45,7 @@ class LHServer(FreqOracleServer):
 
     def aggregate(self, priv_data):
         """
-        Aggregates privatised data from UEClient to be used to calculate frequency estimates.
+        Aggregates privatised data from LHClient to be used to calculate frequency estimates.
 
         Args:
             priv_data: Privatised data of the form returned from UEClient.privatise
@@ -68,7 +68,7 @@ class LHServer(FreqOracleServer):
 
     def estimate(self, data, suppress_warnings=False):
         """
-        Calcualtes a frequency estimate of the given data item using the aggregated data.
+        Calculates a frequency estimate of the given data item using the aggregated data.
 
         Args:
             data: data item
