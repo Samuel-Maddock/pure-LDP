@@ -1,20 +1,19 @@
-from pure_ldp.unary_encoding.ue_client import UEClient
-from pure_ldp.unary_encoding.ue_server import UEServer
+from pure_ldp.frequency_oracles.unary_encoding.ue_client import UEClient
+from pure_ldp.frequency_oracles.unary_encoding.ue_server import UEServer
 
-from pure_ldp.local_hashing.lh_client import LHClient
-from pure_ldp.local_hashing.lh_server import LHServer
+from pure_ldp.frequency_oracles.local_hashing.lh_client import LHClient
+from pure_ldp.frequency_oracles.local_hashing import LHServer
 
-from pure_ldp.histogram_encoding.he_client import HEClient
-from pure_ldp.histogram_encoding.he_server import HEServer
+from pure_ldp.frequency_oracles.histogram_encoding.he_client import HEClient
+from pure_ldp.frequency_oracles.histogram_encoding.he_server import HEServer
 
-from pure_ldp.hadamard_response.hr_client import HadamardResponseClient
-from pure_ldp.hadamard_response.hr_server import HadamardResponseServer
+from pure_ldp.frequency_oracles.hadamard_response.hr_client import HadamardResponseClient
+from pure_ldp.frequency_oracles.hadamard_response.hr_server import HadamardResponseServer
 
-from pure_ldp.prefix_extending.pem_client import PEMClient
-from pure_ldp.prefix_extending.pem_server import PEMServer
+from pure_ldp.heavy_hitters.prefix_extending import PEMClient
+from pure_ldp.heavy_hitters.prefix_extending import PEMServer
 
 import numpy as np
-import time
 from collections import Counter
 
 # Super simple synthetic dataset
@@ -100,20 +99,8 @@ print("Note: We round estimates to the nearest integer")
 
 # ----- PEM Simulation -----
 
-from pure_ldp.development.apple_cms.cms_sever import CMSServer
-from pure_ldp.development.apple_cms.cms_client import CMSClient
-
-from pure_ldp.development.explicit_hist.eh_server import ExplicitHistServer
-from pure_ldp.development.explicit_hist.eh_client import ExplicitHistClient
-
-cms_server = CMSServer(3, 2, 2048)
-cms_client = CMSClient(3, cms_server.get_hash_funcs(), 2048)
-
-hashto_server = ExplicitHistServer(3, d=d)
-hashto_client = ExplicitHistClient(3, d=d)
-
-pem_client = PEMClient(epsilon=3, domain_size=6, start_length=2, segment_length=2, FOClient=hashto_client)
-pem_server = PEMServer(epsilon=3, domain_size=6, start_length=2, segment_length=2, FOServer=hashto_server)
+pem_client = PEMClient(epsilon=3, domain_size=6, start_length=2, segment_length=2)
+pem_server = PEMServer(epsilon=3, domain_size=6, start_length=2, segment_length=2)
 
 
 s1 = "101101"
