@@ -12,6 +12,15 @@ from collections import Counter
 
 class PEMServer:
     def __init__(self, epsilon, domain_size, start_length, segment_length, FOServer=None):
+        """
+
+        Args:
+            epsilon: float privacy budget
+            domain_size: max string length
+            start_length: starting size of the fragment
+            segment_length: length to increase fragment by on each round
+            FOServer: instance of FreqOracleServer to aggregate and estimate the heavy hitters
+        """
         self.epsilon = epsilon
         self.domain_size = domain_size
         self.segment_length = segment_length
@@ -34,14 +43,38 @@ class PEMServer:
                     LHServer(self.epsilon, 2 ** (self.start_length + (i + 1) * self.segment_length), use_olh=True, index_mapper= lambda x:x))
 
     def aggregate(self, privatised_fragment, group):
+        """
+
+        Args:
+            privatised_fragment: a privatised bit string from PEMClient
+            group: the group number
+        """
         self.oracles[group].aggregate(privatised_fragment)
 
     def _estimate_top_k(self, oracle, candidates, k):
+        """
+
+        Args:
+            oracle: frequncy oracle (FreqOracleServer instance)
+            candidates: a list of candidate strings
+            k: int - used to find the top k most frequent strings
+
+        Returns:
+
+        """
         # TODO: Faster/nicer way to do this?
         top_k, _ = zip(*Counter(dict(zip(candidates, oracle.estimate_all(candidates, suppress_warnings=True)))).most_common(k))
         return top_k
 
     def find_top_k(self, k):
+        """
+
+        Args:
+            k: int - used to find the top k most frequent strings
+
+        Returns: list of top-k frequent candidates, and a list of there estimated frequencies
+
+        """
         fragment_size = self.start_length + (0 + 1) * self.segment_length
         candidates = range(0, 2 ** fragment_size)
         top_k = self._estimate_top_k(self.oracles[0], candidates, k)

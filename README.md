@@ -5,15 +5,15 @@ pure-LDP is a Python package that provides simple implementations of pure LDP fr
 
 
 The package has implementations of all three main techniques:
-1. (Optimal) Unary Encoding - Under ```pure_ldp.unary_encoding``` 
-2. (Summation/Thresholding) Histogram encoding - Under ```pure_ldp.histogram_encoding``` 
-3. (Optimal) Local Hashing - Under ```pure_ldp.local_hashing```
-
-The package also includes an implementation of the heavy hitter algorithm Prefix Extending Method (PEM)
-* This is under ```pure_ldp.prefix_extending```
+1. (Optimal) Unary Encoding - Under ```pure_ldp.frequency_oracles.unary_encoding``` 
+2. (Summation/Thresholding) Histogram encoding - Under ```pure_ldp.frequency_oracles.histogram_encoding``` 
+3. (Optimal) Local Hashing - Under ```pure_ldp.frequency_oracles.local_hashing```
 
 There is also support for the frequency oracle Hadamard Response, the code implemented for this is simply a pure-LDP wrapper of [hadamard_response](https://github.com/zitengsun/hadamard_response)
-* This is under ```pure_ldp.hadamard_response```
+* This is under ```pure_ldp.frequency_oracleshadamard_response```
+
+The package also includes an implementation of the heavy hitter algorithm Prefix Extending Method (PEM)
+* This is under ```pure_ldp.heavy_hitters.prefix_extending```
 ## Installation
 
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install.
@@ -31,8 +31,7 @@ Requires numpy, scipy, xxhash, bitarray and bitstring
 
 ```python
 import numpy as np
-from pure-ldp.local_hashing import LHClient
-from pure-ldp.local_hashing import LHServer
+from pure-ldp.frequency_oracles.local_hashing import LHClient, LHServer
 
 # Using Optimal Local Hashing (OLH)
 
