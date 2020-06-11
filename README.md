@@ -10,7 +10,7 @@ The package has implementations of all three main techniques:
 3. (Optimal) Local Hashing - Under ```pure_ldp.frequency_oracles.local_hashing```
 
 There is also support for the frequency oracle Hadamard Response, the code implemented for this is simply a pure-LDP wrapper of [hadamard_response](https://github.com/zitengsun/hadamard_response)
-* This is under ```pure_ldp.frequency_oracleshadamard_response```
+* This is under ```pure_ldp.frequency_oracles.hadamard_response```
 
 The package also includes an implementation of the heavy hitter algorithm Prefix Extending Method (PEM)
 * This is under ```pure_ldp.heavy_hitters.prefix_extending```
