@@ -1,4 +1,3 @@
-
 from pure_ldp.frequency_oracles import *
 from pure_ldp.heavy_hitters import *
 
@@ -100,6 +99,7 @@ print("OLH Estimates:", olh_estimates)
 print("OUE Estimates:", oue_estimates)
 print("THE Estimates:", the_estimates)
 print("HR Estimates:", hr_estimates)
+print("CMS Estimates:", cms_estimates)
 print("Note: We round estimates to the nearest integer")
 
 
