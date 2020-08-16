@@ -28,6 +28,7 @@ class PEMServer:
 
         self.g = math.ceil((self.domain_size - self.start_length) / self.segment_length)
         self.oracles = []
+        self.n = 0
 
         if isinstance(FOServer, FreqOracleServer):
             for i in range(0, self.g):
@@ -42,14 +43,16 @@ class PEMServer:
                 self.oracles.append(
                     LHServer(self.epsilon, 2 ** (self.start_length + (i + 1) * self.segment_length), use_olh=True, index_mapper= lambda x:x))
 
-    def aggregate(self, privatised_fragment, group):
+    def aggregate(self, pem_data):
         """
 
         Args:
             privatised_fragment: a privatised bit string from PEMClient
             group: the group number
         """
+        privatised_fragment, group = pem_data
         self.oracles[group].aggregate(privatised_fragment)
+        self.n += 1
 
     def _estimate_top_k(self, oracle, candidates, k):
         """

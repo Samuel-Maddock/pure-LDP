@@ -4,7 +4,7 @@ import math
 
 
 class HadamardResponseClient(FreqOracleClient):
-    def __init__(self, epsilon, d, index_mapper=None):
+    def __init__(self, epsilon, d, hash_funcs, index_mapper=None):
         """
 
         Args:
@@ -13,8 +13,8 @@ class HadamardResponseClient(FreqOracleClient):
             index_mapper: function
         """
         super().__init__(epsilon, d, index_mapper=index_mapper)
-        self.k = math.ceil(2 ** (math.log(d, 2))) # k must be a power of 2 for hadamard, so we round d to nearest power
-        self.hr = k2k_hadamard.Hadamard_Rand_high_priv(self.k, self.epsilon) # hadamard_response
+        self.update_params(epsilon,d,index_mapper)
+        self.hr.permute = hash_funcs
 
     def update_params(self, epsilon=None, d=None, index_mapper=None):
         """
@@ -27,8 +27,10 @@ class HadamardResponseClient(FreqOracleClient):
         super().update_params(epsilon, d, index_mapper)
 
         if d is not None or epsilon is not None:
-            self.k = math.ceil(2 ** (math.log(self.d, 2))) # k must be a power of 2 for hadamard, so we round d to nearest power
-            self.hr = k2k_hadamard.Hadamard_Rand_high_priv(self.k, self.epsilon) # hadamard_response
+            if epsilon <= 1:
+                self.hr = k2k_hadamard.Hadamard_Rand_high_priv(d, self.epsilon, encode_acc=1) # hadamard_response
+            else:
+                self.hr = k2k_hadamard.Hadamard_Rand_general_original(d, self.epsilon, encode_acc=1) # hadamard_response
 
     def _perturb(self, data):
         """
@@ -39,7 +41,10 @@ class HadamardResponseClient(FreqOracleClient):
         Returns: perturbed data
 
         """
-        return self.hr.encode_symbol(data)
+        if self.epsilon <= 1:
+            return self.hr.encode_symbol(data)
+        else:
+            return self.hr.encode_symbol(self.hr.permute[data]) # General privacy HR needs to permute data
 
     def privatise(self, data):
         """

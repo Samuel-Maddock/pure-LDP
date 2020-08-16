@@ -14,9 +14,11 @@ class HadamardResponseServer(FreqOracleServer):
         """
         super().__init__(epsilon, d, index_mapper=index_mapper)
         self.aggregated_data = []
-        self.k = math.ceil(2 ** (math.log(d, 2)))
-        self.hr = k2k_hadamard.Hadamard_Rand_high_priv(self.k, self.epsilon)
+        self.update_params(epsilon, d, index_mapper)
         self.set_name("Hadamard Response")
+
+    def get_hash_funcs(self):
+        return self.hr.permute
 
     def reset(self):
         """
@@ -35,8 +37,10 @@ class HadamardResponseServer(FreqOracleServer):
         """
         super().update_params(epsilon, d, index_mapper)
         if d is not None or epsilon is not None:
-            self.k = math.ceil(2 ** (math.log(self.d, 2)))
-            self.hr = k2k_hadamard.Hadamard_Rand_high_priv(self.k, self.epsilon)
+            if self.epsilon <= 1:
+                self.hr = k2k_hadamard.Hadamard_Rand_high_priv(d, self.epsilon, encode_acc=1) # hadamard_response
+            else:
+                self.hr = k2k_hadamard.Hadamard_Rand_general_original(d, self.epsilon, encode_acc=1)
 
     def aggregate(self, data):
         """

@@ -6,7 +6,7 @@ with open("README.md", "r") as fh:
 setup(
     name='pure-ldp',
     version='1.0.4',
-    packages=find_packages(),
+    packages=find_packages(include=['pure_ldp'], exclude=['pure_ldp.development', ]),
     install_requires=["xxhash", "numpy", "scipy", "bitstring", "bitarray"],
     url='https://github.com/Samuel-Maddock/pure-LDP',
     license='',

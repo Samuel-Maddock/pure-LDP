@@ -1,19 +1,23 @@
 # Pure-LDP
 
-pure-LDP is a Python package that provides simple implementations of pure LDP frequency oracles detailed in the paper 
+pure-LDP is a Python package that provides simple implementations of various state-of-the-art LDP algorithms (both Frequency Oracles and Heavy Hitters) with the main goal of providing a single, simple interface to use these algorithms.
+
+pure-LDP started as a package for pure LDP frequency oracles detailed in the paper 
 ["Locally Differentially Private Protocols for Frequency Estimation"](https://www.usenix.org/conference/usenixsecurity17/technical-sessions/presentation/wang-tianhao) by Wang et al
 
 
-The package has implementations of all three main techniques:
+The package has implementations of all three main frequency oracles detailed in that paper:
 1. (Optimal) Unary Encoding - Under ```pure_ldp.frequency_oracles.unary_encoding``` 
 2. (Summation/Thresholding) Histogram encoding - Under ```pure_ldp.frequency_oracles.histogram_encoding``` 
 3. (Optimal) Local Hashing - Under ```pure_ldp.frequency_oracles.local_hashing```
 
-There is also support for the frequency oracle Hadamard Response, the code implemented for this is simply a pure-LDP wrapper of [hadamard_response](https://github.com/zitengsun/hadamard_response)
-* This is under ```pure_ldp.frequency_oracles.hadamard_response```
-
 The package also includes an implementation of the heavy hitter algorithm Prefix Extending Method (PEM)
 * This is under ```pure_ldp.heavy_hitters.prefix_extending```
+
+The package also contains other LDP implementations:
+1. Apple's [Count Mean Sketch (CMS / HCMS)](https://machinelearning.apple.com/research/learning-with-privacy-at-scale) Algorithm - This is under ```pure_ldp.frequency_oracles.apple_cms```
+2. [Hadamard Response (HR)](https://arxiv.org/abs/1802.04705) - This is under ```pure_ldp.frequency_oracles.hadamard_response```the code implemented for this is simply a pure-LDP wrapper of the repo [hadamard_response](https://github.com/zitengsun/hadamard_response)
+
 ## Installation
 
 Use the package manager [pip](https://pip.pypa.io/en/stable/) to install.
@@ -31,7 +35,7 @@ Requires numpy, scipy, xxhash, bitarray and bitstring
 
 ```python
 import numpy as np
-from pure-ldp.frequency_oracles.local_hashing import LHClient, LHServer
+from pure_ldp.frequency_oracles.local_hashing import LHClient, LHServer
 
 # Using Optimal Local Hashing (OLH)
 
@@ -57,6 +61,12 @@ print(server_olh.estimate(1)) # Should be approximately 4000 +- 200
 ```
 
 See [example.py](https://github.com/Samuel-Maddock/pure-LDP/blob/master/example.py) for more examples.
+
+## TODO
+1. Implementation of Apple's SFP
+2. Implementation of Google's RAPPOR
+3. Implementation of frequency oracles/heavy hitter algorithms detailed in 
+4. Better documentation !
 
 ## Acknowledgements
 

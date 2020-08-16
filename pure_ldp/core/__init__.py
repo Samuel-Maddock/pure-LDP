@@ -6,7 +6,6 @@ from bitarray import bitarray
 from ._freq_oracle_client import FreqOracleClient
 from ._freq_oracle_server import FreqOracleServer
 
-
 # Helper functions for generating hash funcs
 
 def generate_hash_funcs(k, m):
