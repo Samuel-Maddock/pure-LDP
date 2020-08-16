@@ -1,8 +1,6 @@
 import math
 import xxhash
-
 from pure_ldp.core import FreqOracleServer
-
 
 # Server-side for local-hashing
 
@@ -57,6 +55,7 @@ class LHServer(FreqOracleServer):
         for i in range(0, self.d):
             if priv_data == (xxhash.xxh32(str(i), seed=seed).intdigest() % self.g):
                 self.aggregated_data[i] += 1
+
         self.n += 1
 
     def _update_estimates(self):
@@ -81,17 +80,3 @@ class LHServer(FreqOracleServer):
         index = self.index_mapper(data)
         self.check_and_update_estimates()
         return self.estimated_data[index]
-
-        # def aggregate(self, priv_data, seed):
-    #     """
-    #     Aggregates privatised data from UEClient to be used to calculate frequency estimates.
-    #
-    #     Args:
-    #         priv_data: Privatised data of the form returned from UEClient.privatise
-    #         seed: The seed of the user's hash function
-    #     """
-    #     f = lambda x: xxhash.xxh32(str(x), seed=seed).intdigest() % self.g
-    #     vals = np.fromiter((f(x) for x in range(0,self.d)), dtype=np.int)
-    #     support = (vals==priv_data).astype("int8")
-    #     self.aggregated_data += support
-    #     self.n += 1
