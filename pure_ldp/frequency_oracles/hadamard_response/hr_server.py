@@ -18,7 +18,10 @@ class HadamardResponseServer(FreqOracleServer):
         self.set_name("Hadamard Response")
 
     def get_hash_funcs(self):
-        return self.hr.permute
+        if self.epsilon > 1:
+            return self.hr.permute
+        else:
+            return
 
     def reset(self):
         """
