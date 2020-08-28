@@ -4,21 +4,28 @@ import math
 
 
 class HadamardResponseServer(FreqOracleServer):
-    def __init__(self, epsilon, d, index_mapper=None):
+    def __init__(self, epsilon, d, index_mapper=None, normalization=0):
         """
 
         Args:
-            epsilon:
-            d:
-            index_mapper:
+            epsilon (float): Privacy Budget
+            d (int): Domain size
+            index_mapper (Optional function): A function that maps domain elements to {0, ... d-1}
+            normalisation (Optional int): 0 (default) - No normalisation
+                           1 - Normalisation (+ clip to 0)
+                           2 - Projects estimates onto the probability simplex
         """
         super().__init__(epsilon, d, index_mapper=index_mapper)
         self.aggregated_data = []
         self.update_params(epsilon, d, index_mapper)
         self.set_name("Hadamard Response")
+        self.normalization = normalization
 
     def get_hash_funcs(self):
-        return self.hr.permute
+        if self.epsilon > 1:
+            return self.hr.permute
+        else:
+            return
 
     def reset(self):
         """
@@ -57,7 +64,7 @@ class HadamardResponseServer(FreqOracleServer):
         Returns: estimated data
 
         """
-        self.estimated_data = self.hr.decode_string(self.aggregated_data) * self.n
+        self.estimated_data = self.hr.decode_string(self.aggregated_data, normalization=self.normalization-1) * self.n # k2khadamard using norm=0 for normalisation, 1 for simplex and anything else for none
         return self.estimated_data
 
     def estimate(self, data, suppress_warnings=False):

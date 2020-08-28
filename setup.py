@@ -1,12 +1,16 @@
 from setuptools import setup, find_packages
 import shutil
+import os
 
 with open("README.md", "r") as fh:
     long_description = fh.read()
 
-shutil.rmtree("./build")
-shutil.rmtree("./dist")
-shutil.rmtree("./pure_ldp.egg-info")
+if os.path.exists("./build"):
+    shutil.rmtree("./build")
+if os.path.exists("./dist"):
+    shutil.rmtree("./dist")
+if os.path.exists("./pure_ldp.egg-info"):
+    shutil.rmtree("./pure_ldp.egg-info")
 
 setup(
     name='pure-ldp',

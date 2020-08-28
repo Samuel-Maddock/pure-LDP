@@ -14,7 +14,9 @@ class HadamardResponseClient(FreqOracleClient):
         """
         super().__init__(epsilon, d, index_mapper=index_mapper)
         self.update_params(epsilon,d,index_mapper)
-        self.hr.permute = hash_funcs
+
+        if self.epsilon > 1:
+            self.hr.permute = hash_funcs
 
     def update_params(self, epsilon=None, d=None, index_mapper=None):
         """
