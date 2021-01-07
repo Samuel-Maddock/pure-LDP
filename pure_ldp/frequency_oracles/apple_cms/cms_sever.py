@@ -18,11 +18,11 @@ class CMSServer(FreqOracleServer):
             index_mapper (optional func): Index map function
         """
         super().__init__(epsilon, None, index_mapper)
-        self.update_params(k,m, epsilon, d=None, index_mapper=None)
+        self.is_hadamard = is_hadamard
+        self.update_params(k,m, epsilon, index_mapper=None)
         self.hash_funcs = generate_hash_funcs(k,m)
         self.sketch_matrix = np.zeros((self.k, self.m))
         self.transformed_matrix = np.zeros((self.k, self.m))
-        self.is_hadamard = is_hadamard
 
         self.last_estimated = self.n
         self.ones = np.ones(self.m)
@@ -30,7 +30,7 @@ class CMSServer(FreqOracleServer):
         if self.is_hadamard:
             self.had = hadamard(self.m)
 
-    def update_params(self, k=None, m=None, epsilon=None, d=None, index_mapper=None):
+    def update_params(self, k=None, m=None, epsilon=None, index_mapper=None):
         """
         Updated internal parameters
         Args:
@@ -43,9 +43,12 @@ class CMSServer(FreqOracleServer):
         self.k = k if k is not None else self.k
         self.m = m if m is not None else self.m
         self.hash_funcs = generate_hash_funcs(self.k,self.m)
-        super().update_params(epsilon=epsilon, d=d, index_mapper=d) # This also calls reset() to reset sketch size
+        super().update_params(epsilon=epsilon, index_mapper=index_mapper) # This also calls reset() to reset sketch size
         if epsilon is not None:
-            self.c = (math.pow(math.e, epsilon / 2) + 1) / (math.pow(math.e, epsilon / 2) - 1)
+            if self.is_hadamard:
+                self.c = (math.pow(math.e, epsilon) + 1) / (math.pow(math.e, epsilon) - 1)
+            else:
+                self.c = (math.pow(math.e, epsilon / 2) + 1) / (math.pow(math.e, epsilon / 2) - 1)
 
     def _add_to_cms_sketch(self, data):
         """
