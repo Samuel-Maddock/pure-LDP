@@ -15,6 +15,7 @@ class LHClient(FreqOracleClient):
 
         Args:
             epsilon: float - The privacy budget
+            d: integer - Domain size
             g: Optional integer - The domain [g] = {1,2,...,g} that data is hashed to, 2 by default (binary local hashing)
             use_olh: Optional boolean - if set to true uses Optimised Local Hashing (OLH) i.e g is set to round(e^epsilon + 1)
             index_mapper: Optional function - maps data items to indexes in the range {0, 1, ..., d-1} where d is the size of the data domain
