@@ -48,7 +48,7 @@ class LHClient(FreqOracleClient):
         """
         Used internally to perturb data using local hashing.
 
-        Will hash the user's data item and then peturb it with probabilities that
+        Will hash the user's data item and then perturb it with probabilities that
         satisfy epsilon local differential privacy. Local hashing is explained
         in more detail here: https://www.usenix.org/system/files/conference/usenixsecurity17/sec17-wang-tianhao.pdf
 

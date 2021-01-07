@@ -47,7 +47,6 @@ class LHServer(FreqOracleServer):
 
         Args:
             priv_data: Privatised data of the form returned from UEClient.privatise
-            seed: kwarg - The seed of the user's hash function, must be passed as a keyword arg
         """
         seed = priv_data[1]
         priv_data = priv_data[0]
