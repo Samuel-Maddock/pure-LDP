@@ -4,22 +4,18 @@ import math
 
 
 class HadamardResponseServer(FreqOracleServer):
-    def __init__(self, epsilon, d, index_mapper=None, normalization=0):
+    def __init__(self, epsilon, d, index_mapper=None):
         """
 
         Args:
             epsilon (float): Privacy Budget
             d (int): Domain size
             index_mapper (Optional function): A function that maps domain elements to {0, ... d-1}
-            normalisation (Optional int): 0 (default) - No normalisation
-                           1 - Normalisation (+ clip to 0)
-                           2 - Projects estimates onto the probability simplex
         """
         super().__init__(epsilon, d, index_mapper=index_mapper)
         self.aggregated_data = []
         self.update_params(epsilon, d, index_mapper)
         self.set_name("Hadamard Response")
-        self.normalization = normalization
 
     def get_hash_funcs(self):
         if self.epsilon > 1:
@@ -43,11 +39,12 @@ class HadamardResponseServer(FreqOracleServer):
             index_mapper: optional - function
         """
         super().update_params(epsilon, d, index_mapper)
-        if d is not None or epsilon is not None:
+        encode_acc = 0
+        if epsilon is not None:
             if self.epsilon <= 1:
-                self.hr = k2k_hadamard.Hadamard_Rand_high_priv(d, self.epsilon, encode_acc=1) # hadamard_response
+                self.hr = k2k_hadamard.Hadamard_Rand_high_priv(d, self.epsilon, encode_acc=encode_acc) # hadamard_response
             else:
-                self.hr = k2k_hadamard.Hadamard_Rand_general_original(d, self.epsilon, encode_acc=1)
+                self.hr = k2k_hadamard.Hadamard_Rand_general_original(d, self.epsilon, encode_acc=encode_acc)
 
     def aggregate(self, data):
         """
@@ -64,7 +61,7 @@ class HadamardResponseServer(FreqOracleServer):
         Returns: estimated data
 
         """
-        self.estimated_data = self.hr.decode_string(self.aggregated_data, normalization=self.normalization-1) * self.n # k2khadamard using norm=0 for normalisation, 1 for simplex and anything else for none
+        self.estimated_data = self.hr.decode_string(self.aggregated_data, normalization=-1) * self.n # no normalisation
         return self.estimated_data
 
     def estimate(self, data, suppress_warnings=False):
