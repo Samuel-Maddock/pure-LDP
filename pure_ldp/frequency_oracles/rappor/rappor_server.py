@@ -49,6 +49,30 @@ class RAPPORServer(FreqOracleServer):
         if reg_const is None:
             self.reg_const = 0.025 * self.f
 
+    def update_params(self, epsilon=None, d=None, index_mapper=None, f=None, m=None, k=None, num_of_cohorts=None):
+        super().update_params(epsilon, d, index_mapper)
+        self.f = f if f is not None else self.f
+        self.m = m if m is not None else self.m
+        self.num_of_cohorts = num_of_cohorts if num_of_cohorts is not None else self.num_of_cohorts
+
+        if f is not None:
+            self.epsilon = 2 * self.k * math.log((1 - 0.5 * f) / (0.5 * f))
+            self.reg_const = 0.025 * self.f
+        if m is not None or num_of_cohorts is not None:
+            # If the bloom filter size or number of cohorts changes then reset bloom filters and cohort counts
+            self.bloom_filters = [np.zeros(self.m) for i in range(0, self.num_of_cohorts)]
+            self.cohort_count = np.zeros(self.num_of_cohorts)
+
+        if k is not None or num_of_cohorts is not None:
+            self.hash_family = self._generate_hash_funcs()
+            raise RuntimeWarning("RAPPORServer hash functions were reset due to a change in num_of_cohorts or k. RAPPORClient hash functions should be updated manually otherwise you will face inconsistencies")
+
+        self.reset() # Changing parameters will reset RAPPORs state
+
+    def reset(self):
+        super().reset()
+        self.normalised_data = []
+
     def _generate_hash_funcs(self):
         """
         Generates hash functions for RAPPOR instance

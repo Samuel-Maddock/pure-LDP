@@ -24,7 +24,7 @@ class SketchResponseServer(FreqOracleServer):
             sketch_method (Optional int): The sketch method used in the estimation -
                             0 - Takes the minimum of sketch entries (Count-Min Sketch)
                             1 - Takes the median of sketch entries (Count-Median Sketch)
-                            Anythin else - Mean (Count-Mean Sketch)
+                            Anything else - Mean (Count-Mean Sketch)
             count_sketch (optional - boolean): If True, will use count-sketch for estimation (instead of count-mean sketch)
         """
         self.k = k
@@ -78,7 +78,7 @@ class SketchResponseServer(FreqOracleServer):
     def get_hash_funcs(self):
         """
         Returns the hash functions used by the sketch
-        
+
         Returns:
             List of hash functions
         """
@@ -90,15 +90,9 @@ class SketchResponseServer(FreqOracleServer):
         """
         super().reset()
 
-    def update_params(self, epsilon=None, index_mapper=None):
-        """
-        Updates SketchResponse Server parameters, will reset aggregated/estimated data.
-        Args:
-            epsilon: optional - privacy budget
-            d: optional - domain size
-            index_mapper: optional - function
-        """
-        super().update_params(epsilon, None, index_mapper)
+    # TODO: Update parameters for SketchResponseServer
+    def update_params(self, epsilon=None, d=None, index_mapper=None,  m=None, hash_funcs=None, fo_server=None, count_sketch=None):
+        raise NotImplementedError("Updating parameters for sketch_response_server is not supported yet")
 
     def aggregate(self, data):
         """

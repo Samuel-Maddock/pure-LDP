@@ -21,6 +21,10 @@ class FastLHClient(LHClient):
         if k is not None:
             self.k = k
 
+    def update_params(self, epsilon=None, d=None, k=None, use_olh=None, g=None, index_mapper=None):
+        super().update_params(epsilon, d, use_olh, g, index_mapper)
+        self.k = k if k is not None else self.k
+
     def privatise(self, data):
         """
         Privatises a user's data using fast local hashing (FLH)

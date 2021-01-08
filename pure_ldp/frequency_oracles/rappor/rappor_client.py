@@ -28,6 +28,13 @@ class RAPPORClient(FreqOracleClient):
         self.hash_family = hash_funcs
         self.num_of_cohorts = num_of_cohorts
 
+    def update_params(self, epsilon=None, d=None, index_mapper=None, f=None, m=None, num_of_cohorts=None, hash_funcs=None):
+        super().update_params(epsilon, d, index_mapper)
+        self.f = f if f is not None else self.f
+        self.m = m if m is not None else self.m
+        self.num_of_cohorts = num_of_cohorts if num_of_cohorts is not None else self.num_of_cohorts
+        self.hash_family = hash_funcs if hash_funcs is not None else hash_funcs
+
     def _perturb(self, data):
         """
         Used internally to perturb data using RAPPOR

@@ -23,6 +23,20 @@ class PCSServer(FreqOracleServer):
         self.g_funcs = generate_hash_funcs(l, 2)
         self.hash_funcs = list(zip(self.h_funcs, self.g_funcs))
 
+    def update_params(self, epsilon=None, d=None, index_mapper=None, l=None, w=None, use_median=None):
+        super().update_params(epsilon, d, index_mapper)
+        self.l = l if l is not None else self.l
+        self.w = w if w is not None else self.w
+        self.use_median = use_median if use_median is not None else self.use_median
+
+        # if l or w is updated we need to reset the sketch matrix and generate new hash functions..
+            # TODO: Output warning to the user that the sketch and hash funcs have changed
+        if l is not None or w is not None:
+            self.sketch_matrix = np.zeros((self.l, self.w))
+            self.h_funcs = generate_hash_funcs(self.l, self.w)
+            self.g_funcs = generate_hash_funcs(self.l, 2)
+            self.hash_funcs = list(zip(self.h_funcs, self.g_funcs))
+
     def get_hash_funcs(self):
         """
         Returns the hash functions used by the sketch

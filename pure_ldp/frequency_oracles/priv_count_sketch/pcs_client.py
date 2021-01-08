@@ -26,6 +26,14 @@ class PCSClient(FreqOracleClient):
         self.hash_funcs = hash_funcs
         self.bias = math.exp(self.epsilon) / (1 + math.exp(self.epsilon))
 
+    def update_params(self, epsilon=None, d=None, index_mapper=None, l=None, w=None):
+        super().update_params(epsilon, d, index_mapper)
+        self.l = l if l is not None else self.l
+        self.w = w if w is not None else self.w
+
+        if epsilon is not None:
+            self.bias = math.exp(self.epsilon) / (1 + math.exp(self.epsilon))
+
     # Duchi-Jordan-Wainwright 2013, Bassily-Smith-2015 randomizer
     def _perturb(self, data):
         h_loc = data[0]

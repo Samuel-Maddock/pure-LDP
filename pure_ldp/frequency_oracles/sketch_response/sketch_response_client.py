@@ -18,41 +18,36 @@ class SketchResponseClient(FreqOracleClient):
         """
         self.k = len(hash_funcs)
         self.lh_k = lh_k
-        self.m = m
-        self.count_sketch = count_sketch
         self.hash_funcs = hash_funcs
-
-        d = self.m
         self.cs_map = None
-        if self.count_sketch:
-            d = 2 * self.m
 
+        super().__init__(epsilon, d=None, index_mapper=index_mapper)
+        self.update_params(epsilon, d=None, index_mapper=index_mapper, m=m, count_sketch=count_sketch)
+
+        if fo_client is None:
+            self.client = FastLHClient(self.epsilon, self.d, self.lh_k, use_olh=True, index_mapper=None)
+
+        self.client.update_params(index_mapper=lambda x:x, epsilon=self.epsilon)
+
+    def update_params(self, epsilon=None, d=None, index_mapper=None, m=None, hash_funcs=None, fo_client=None, count_sketch=None):
+        self.m = m if m is not None else self.m
+        d = self.m
+
+        if self.count_sketch and m is not None:
+            d = 2 * self.m
             def cs_map(x):
                 if x > 0:
                     return x-1
                 else:
                     return 2*self.m - abs(x)
             self.cs_map = cs_map
-
-        super().__init__(epsilon, d, index_mapper=index_mapper)
-        self.update_params(epsilon, d, index_mapper)
-
-        if isinstance(fo_client, FreqOracleClient):
-            self.client = fo_client
-        else:
-            self.client = FastLHClient(self.epsilon, d, self.lh_k, use_olh=True, index_mapper=None)
-
-        self.client.update_params(index_mapper=lambda x:x, epsilon=self.epsilon)
-
-    def update_params(self, epsilon=None, d=None, index_mapper=None):
-        """
-        Updates sketch client-side params
-        Args:
-            epsilon: optional - privacy budget
-            d: optional - domain size
-            index_mapper: optional - function
-        """
+            
         super().update_params(epsilon, d, index_mapper)
+
+        if fo_client is not None and isinstance(fo_client, FreqOracleClient):
+            self.client = fo_client
+
+        self.hash_funcs = hash_funcs if hash_funcs is not None else self.hash_funcs
 
     def privatise(self, data):
         """
