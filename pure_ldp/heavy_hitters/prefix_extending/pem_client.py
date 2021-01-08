@@ -1,50 +1,47 @@
-from pure_ldp.frequency_oracles.local_hashing.lh_client import LHClient
 from pure_ldp.core import FreqOracleClient
-
+from pure_ldp.heavy_hitters._hh_client import HeavyHitterClient
 import math
 import random
 
-from bitstring import BitArray
-
-class PEMClient:
-    def __init__(self, epsilon, domain_size, start_length, segment_length, FOClient=None):
+class PEMClient(HeavyHitterClient):
+    def __init__(self, epsilon, start_length, max_string_length, fragment_length, alphabet=None, index_mapper=None, fo_client=None, padding_char="*"):
         """
 
         Args:
-            epsilon: privacy budget
-            domain_size: max size of the strings to find
+            epsilon (float): Privacy Budget
             start_length: The starting fragment length
-            segment_length: the length to increase the fragment by on each iteration
-            FOClient: a FreqOracleClient instance, used to privatise the data
+            max_string_length: max size of the strings to find
+            fragment_length: the length to increase the fragment by on each iteration
+            alphabet (optional list): The alphabet over which we are privatising strings
+            index_mapper (optional func): Index map function
+            fo_client (FreqOracleClient): a FreqOracleClient instance, used to privatise the data
         """
-        self.epsilon = epsilon
-        self.domain_size = domain_size
-        self.segment_length = segment_length
-        self.start_length = start_length
-        self.g = math.ceil((self.domain_size-self.start_length)/self.segment_length)
+        super().__init__(epsilon, start_length, max_string_length, fragment_length, alphabet, index_mapper, fo_client, padding_char)
 
-        self.index_mapper = lambda x:x
-        if isinstance(FOClient, FreqOracleClient):
-            self.client = FOClient
-        else:
-            self.client = LHClient(self.epsilon, d=None, use_olh=True)
+        self.g = math.ceil((self.max_string_length-self.start_length) / self.fragment_length)
         self.client.update_params(index_mapper=self.index_mapper)
 
-    def privatise(self, bit_string):
+    def privatise(self, user_string):
         """
         This method is used to privatise a bit string using PEM
         Args:
-            bit_string: The bit string to be privatised
+            user_string: The string to be privatised
 
-        Returns: Privatised bit string and the group number
+        Returns: Privatised string and the group number
 
         """
+
+        padded_string = self._pad_string(user_string)
         group = random.randint(0,self.g-1)
 
-        d = 2 ** (self.start_length + (group + 1) * self.segment_length)
-        self.client.update_params(d=d)
+        # Must calculate domain size based on the user's group and update client params
+        d = len(self.alphabet) ** (self.start_length + (group + 1) * self.fragment_length)
+        try:
+            self.client.update_params(d=d) # TODO: Make sure all frequency oracles have a working update_params...
+        except TypeError: # Oracles like CMS don't have a d parameter to update
+            pass
 
-        fragment_size = self.start_length + (group+1)*self.segment_length
-        fragment = bit_string[0:min(fragment_size, len(bit_string))]
-        num = BitArray(bin=fragment).uint
-        return self.client.privatise(num), group
+        fragment_size = self.start_length + (group+1)*self.fragment_length
+        fragment = padded_string[0:min(fragment_size, len(padded_string))]
+
+        return self.client.privatise(fragment), group
