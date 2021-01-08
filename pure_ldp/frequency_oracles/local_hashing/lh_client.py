@@ -25,7 +25,7 @@ class LHClient(FreqOracleClient):
         self.g =g
         self.update_params(epsilon, d, g, index_mapper)
 
-    def update_params(self, epsilon=None, d=None, g=None, index_mapper=None):
+    def update_params(self, epsilon=None, d=None, use_olh=None, g=None, index_mapper=None):
         """
 
         Args:
@@ -35,6 +35,9 @@ class LHClient(FreqOracleClient):
             index_mapper: optional - function
         """
         super().update_params(epsilon, d, index_mapper) # Updates core params
+
+        # If use_olh is true, then update the g parameter
+        self.use_olh = use_olh if use_olh is not None else self.use_olh
 
         # Updates g and probs
         self.g = g if g is not None else self.g

@@ -23,7 +23,7 @@ class LHServer(FreqOracleServer):
         self.use_olh = use_olh
         self.update_params(epsilon, d, g, index_mapper)
 
-    def update_params(self, epsilon=None, d=None, g=None, index_mapper=None):
+    def update_params(self, epsilon=None, d=None, use_olh=None, g=None, index_mapper=None):
         """
         Updates LHServer parameters, will reset any aggregated/estimated data
         Args:
@@ -34,11 +34,16 @@ class LHServer(FreqOracleServer):
         """
         super().update_params(epsilon, d, index_mapper)
 
+        # If use_olh is true, then update the g parameter
+        if use_olh is not None:
+            self.use_olh = use_olh
+
+        self.g = g if g is not None else self.g
+        if self.use_olh is True:
+            self.g = int(round(math.exp(self.epsilon))) + 1
+
         # Update probs and g
         if epsilon is not None:
-            if self.use_olh is True:
-                self.g = int(round(math.exp(self.epsilon))) + 1
-
             self.p = math.exp(self.epsilon) / (math.exp(self.epsilon) + self.g - 1)
 
     def aggregate(self, priv_data):
