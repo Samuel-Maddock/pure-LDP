@@ -12,6 +12,7 @@ class HeavyHitterServer():
             fragment_length: The length to increase the fragment by on each iteration
             alphabet (optional list): The alphabet over which we are privatising strings
             index_mapper (optional func): Index map function
+            padding_char (optional str): The character used to pad strings to a fixed length
             estimator_norm (optional int): The normalisation type for the server estimators
                            0 - No Norm
                            1 - Additive Norm

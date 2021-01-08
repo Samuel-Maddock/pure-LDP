@@ -10,7 +10,7 @@ from pure_ldp.frequency_oracles import LHServer
 
 
 class TreeHistServer(HeavyHitterServer):
-    def __init__(self, epsilon, max_string_length, fragment_length, alphabet=None, index_mapper=None, fo_server=None, padding_char="*"):
+    def __init__(self, epsilon, max_string_length, fragment_length, alphabet=None, index_mapper=None, fo_server=None, padding_char="*", estimator_norm=0):
         """
 
         Args:
@@ -21,8 +21,13 @@ class TreeHistServer(HeavyHitterServer):
             index_mapper (optional func): Index map function
             fo_client (FreqOracleClient): a FreqOracleClient instance, used to privatise the data
             padding_char (optional str): The character used to pad strings to a fixed length
+            estimator_norm (optional int): The normalisation type for the server estimators
+                   0 - No Norm
+                   1 - Additive Norm
+                   2 - Prob Simplex
+                   3 (or otherwise) - Threshold cut
         """
-        super().__init__(epsilon, 0, max_string_length, fragment_length, alphabet, index_mapper, padding_char)
+        super().__init__(epsilon, 0, max_string_length, fragment_length, alphabet, index_mapper, padding_char, estimator_norm)
         self.num_n_grams = int(max_string_length / fragment_length)  # Number of N-grams
 
         # TODO: Deal with situation where the padding char is in the alphabet...
@@ -80,7 +85,7 @@ class TreeHistServer(HeavyHitterServer):
 
         if k:
             for i in range(0, self.num_n_grams):
-                fragments = zip(self.fragment_estimator.estimate_all(word_queue)*scaling_factor, word_queue)
+                fragments = zip(self.fragment_estimator.estimate_all(word_queue)*scaling_factor, word_queue, normalization=self.estimator_norm)
                 top_k = heapq.nlargest(k, fragments)
                 word_queue = []
                 for item in top_k:
@@ -109,4 +114,4 @@ class TreeHistServer(HeavyHitterServer):
                     word_queue.append(toAdd)
 
 
-        return list(candidate_strings.keys()), self.word_estimator.estimate_all(candidate_strings.keys())
+        return list(candidate_strings.keys()), self.word_estimator.estimate_all(candidate_strings.keys(), normalization=self.estimator_norm)
