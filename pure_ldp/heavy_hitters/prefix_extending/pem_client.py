@@ -15,6 +15,7 @@ class PEMClient(HeavyHitterClient):
             alphabet (optional list): The alphabet over which we are privatising strings
             index_mapper (optional func): Index map function
             fo_client (FreqOracleClient): a FreqOracleClient instance, used to privatise the data
+            padding_char (optional str): The character used to pad strings to a fixed length
         """
         super().__init__(epsilon, start_length, max_string_length, fragment_length, alphabet, index_mapper, fo_client, padding_char)
 
