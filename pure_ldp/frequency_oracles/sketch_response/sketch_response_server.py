@@ -90,10 +90,6 @@ class SketchResponseServer(FreqOracleServer):
         """
         super().reset()
 
-    # TODO: Update parameters for SketchResponseServer
-    def update_params(self, epsilon=None, d=None, index_mapper=None,  m=None, hash_funcs=None, fo_server=None, count_sketch=None):
-        raise NotImplementedError("Updating parameters for sketch_response_server is not supported yet")
-
     def aggregate(self, data):
         """
         Used to aggregate privatised data to the server

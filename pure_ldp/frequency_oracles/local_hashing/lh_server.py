@@ -21,7 +21,7 @@ class LHServer(FreqOracleServer):
         self.set_name("LHServer")
         self.g = g
         self.use_olh = use_olh
-        self.update_params(epsilon, d, g, index_mapper)
+        self.update_params(epsilon=epsilon, d=d, g=g, index_mapper=index_mapper)
 
     def update_params(self, epsilon=None, d=None, use_olh=None, g=None, index_mapper=None):
         """

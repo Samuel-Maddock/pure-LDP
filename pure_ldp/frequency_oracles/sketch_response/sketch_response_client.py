@@ -33,7 +33,7 @@ class SketchResponseClient(FreqOracleClient):
         self.m = m if m is not None else self.m
         d = self.m
 
-        if self.count_sketch and m is not None:
+        if count_sketch is True and m is not None:
             d = 2 * self.m
             def cs_map(x):
                 if x > 0:

@@ -17,9 +17,8 @@ class FastLHServer(LHServer):
             index_mapper: Optional function - maps data items to indexes in the range {0, 1, ..., d-1} where d is the size of the data domain
             hash_matrix: Optional matrix - Allows the use of a pre-computed hash matrix that contains hashed domain elements
         """
-        super().__init__(epsilon, d, g, use_olh, index_mapper=index_mapper)
-
         self.k = k
+        super().__init__(epsilon, d, g, use_olh, index_mapper=index_mapper)
         self.hash_counts = np.zeros((self.k, self.g))
 
         # g = lambda i,j: xxhash.xxh32(str(int(j)), seed=int(i)).intdigest() % self.g
@@ -36,7 +35,7 @@ class FastLHServer(LHServer):
             self.hash_matrix = hash_matrix
 
     def update_params(self, epsilon=None, d=None, k=None, use_olh=None, g=None, index_mapper=None):
-        super().update_params(epsilon, d, use_olh, g, index_mapper)
+        super().update_params(epsilon=epsilon, d=d, use_olh=use_olh, g=g, index_mapper=index_mapper)
         self.k = k if k is not None else self.k
 
     def aggregate(self, priv_data):
