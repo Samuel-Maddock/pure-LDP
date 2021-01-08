@@ -104,7 +104,8 @@ class CMSServer(FreqOracleServer):
 
     def aggregate(self, data):
         """
-        Aggregated privatised data
+        Aggregates privatised data
+
         Args:
             data: Data privatised by CMS/HCMS
         """

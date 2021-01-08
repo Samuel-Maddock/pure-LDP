@@ -298,10 +298,6 @@ class Hadamard_Rand_general:
     #        dist[int(self.reverse[i])] = dist1[i]
     #    return dist
 
-
-# In[ ]:
-
-
 #The Hadamard randomized response for all regimes (original version)
 class Hadamard_Rand_general_original:
     def __init__(self, absz, pri_para, encode_acc = 0): # absz: alphabet size, pri_para: privacy parameter
@@ -320,7 +316,9 @@ class Hadamard_Rand_general_original:
         self.outbit = self.tailbit + self.initbit #total number of output bits
         self.outsz = int(math.pow(2,self.outbit)) # output alphabet size K
         self.permute, self.reverse = Random_Permutation(absz) #Initialize random permutation
-        
+        # self.permute,self.reverse = [], []
+        self.dist_inter = []
+        self.dist_block = []
         self.ifencode_acc = encode_acc #whether to accelerate encoding process
         if encode_acc == 1:
             self.H = Hadarmard_init(self.partsz) # initialize Hadarmard matrix
@@ -390,7 +388,7 @@ class Hadamard_Rand_general_original:
         freq = count/float(l)
         
         if iffast == 1:
-            parts = self.insz//(self.partsz-1) 
+            parts = self.insz//(self.partsz-1)
             freq_S = np.zeros((parts+1)*self.partsz)
             freq_block = np.zeros((parts+1)*self.partsz)
         
@@ -410,6 +408,7 @@ class Hadamard_Rand_general_original:
                     freq_block[i] = freq_block[i] + freq[i*self.partsz+j]     
                     
             dist_block = np.true_divide((2*self.part-1+self.exp)*(freq_block)-2,self.exp-1) # calculate the estimated original prob of each block
+            dist_S = np.zeros(self.insz)
             for i in range(0, self.insz): 
                 pi = int(i)//(self.partsz-1)
                 ti = pi*self.partsz + int(i)%(self.partsz-1)+1
@@ -430,3 +429,47 @@ class Hadamard_Rand_general_original:
         for i in range(self.insz):
             dist1[int(self.reverse[i])] = dist[i]
         return dist1
+
+    # Debugging methods, generate_dist is the first half of decode_string
+    def generate_dist(self, out_list,iffast = 1, normalization = 0):
+        l = len(out_list)
+        count,edges = np.histogram(out_list,range(self.outsz+1))
+        freq = count/float(l)
+
+        if iffast == 1:
+            parts = self.insz//(self.partsz-1)
+            freq_S = np.zeros((parts+1)*self.partsz)
+            freq_block = np.zeros((parts+1)*self.partsz)
+
+            for i in range(0, parts+1):
+                Trans = FWHT_A(self.partsz, freq[i*self.partsz: (i+1)*self.partsz])
+                freq_block[i] = Trans[0]
+                freq_S[i*(self.partsz-1): (i+1)*(self.partsz-1)] = (Trans[1:self.partsz] + Trans[0])/float(2)
+            dist_S = freq_S[0:self.insz]
+
+            dist_block = np.true_divide((2*self.part-1+self.exp)*(freq_block)-2,self.exp-1) # calculate the estimated original prob of each block
+
+        else:
+            freq_block = np.zeros(self.part) # count the number of appearances of each block
+            for i in range(0,self.part):
+                #count_block[i] = np.sum(count[i*self.partsz : (i+1)*self.partsz - 1])
+                for j in range(0,self.partsz):
+                    freq_block[i] = freq_block[i] + freq[i*self.partsz+j]
+
+            dist_block = np.true_divide((2*self.part-1+self.exp)*(freq_block)-2,self.exp-1) # calculate the estimated original prob of each block
+            dist_S = np.zeros(self.insz)
+            for i in range(0, self.insz):
+                pi = int(i)//(self.partsz-1)
+                ti = pi*self.partsz + int(i)%(self.partsz-1)+1
+                for x in range(pi*self.partsz, (pi+1)*self.partsz): # count the number of appearances of each C_i
+                    if self.entry_check(ti,x) == 0:
+                        dist_S[i] = dist_S[i] + freq[x]
+
+        dist_inter = np.true_divide(2*(dist_S*(2*self.part-1+self.exp)-1),self.exp-1) # calculate intermediate prob
+        self.dist_block = dist_block
+        self.dist_inter = dist_inter
+
+
+    def estimate(self, item):
+        return self.dist_inter[item] - self.dist_block[item//(self.partsz-1)]
+
