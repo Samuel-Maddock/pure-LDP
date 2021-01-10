@@ -9,7 +9,8 @@ from .histogram_encoding import *
 from .rappor import *
 from .priv_count_sketch import *
 
-#from .explicit_hist import *
-#from .hashtogram import *
+# from .explicit_hist import *
+# from .hashtogram import *
 
+from .direct_encoding import*
 from .sketch_response import *
