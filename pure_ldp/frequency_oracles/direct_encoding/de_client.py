@@ -1,6 +1,7 @@
 from pure_ldp.core import FreqOracleClient
 import math
 import numpy as np
+import random
 
 class DEClient(FreqOracleClient):
     def __init__(self, epsilon, d, index_mapper=None):
@@ -23,9 +24,14 @@ class DEClient(FreqOracleClient):
             self.q = 1/self.const
 
     def _perturb(self, data):
-        probs = np.repeat(self.q,self.d)
-        probs[data] = self.p # Sample the data with prob p else with prob q
-        return np.random.choice(range(0,self.d), p=probs)
+        if random.random() < self.p:
+            return data
+        else:
+            perturbed_data = random.randint(0,self.d-2)
+            if perturbed_data == data:
+                return self.d-1
+            else:
+                return perturbed_data
 
     def privatise(self, data):
         """
