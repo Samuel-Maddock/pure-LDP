@@ -29,8 +29,7 @@ The package has implementations of all three main frequency oracles detailed in 
 2. (Summation/Thresholding) Histogram encoding - Under ```pure_ldp.frequency_oracles.histogram_encoding``` 
 3. (Optimal) Local Hashing - Under ```pure_ldp.frequency_oracles.local_hashing```
 
-The package also includes an implementation of the heavy hitter algorithm Prefix Extending Method (PEM)
-* This is under ```pure_ldp.heavy_hitters.prefix_extending```
+The package also includes an implementation of the heavy hitter algorithm Prefix Extending Method (PEM) under ```pure_ldp.heavy_hitters.prefix_extending```
 
 Over time it has evolved to include many more implementations of other LDP frequency estimation algorithms:
 1. Apple's [Count Mean Sketch (CMS / HCMS)](https://machinelearning.apple.com/research/learning-with-privacy-at-scale) Algorithm - This is under ```pure_ldp.frequency_oracles.apple_cms```
@@ -74,11 +73,13 @@ print(server_olh.estimate(1)) # Should be approximately 4000 +- 200
 
 ```
 
+See [example.py](https://github.com/Samuel-Maddock/pure-LDP/blob/master/example.py) for more examples.
+
+
  ## Simulation Framework
  
  This is currently WIP but there is already significant code under ```pure_ldp.simulations``` that allow you to build experiments to compare various frequency oracles/heavy hitters under various conditions. Generic helpers to run experiments for FOs and HHs are included under ```pure_ldp.simulations.helpers```. See ```pure_ldp.simulations.paper_experiments.py``` for examples
  
-See [example.py](https://github.com/Samuel-Maddock/pure-LDP/blob/master/example.py) for more examples.
 
 ## TODO
 1. Better documentation !
