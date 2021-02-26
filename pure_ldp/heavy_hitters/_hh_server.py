@@ -35,7 +35,7 @@ class HeavyHitterServer():
             self.alphabet = ["0","1"]
 
         if index_mapper is not None:
-            self.index_mapper = index_mapper
+            self.index_mapper = lambda x: index_mapper(x.split(self.padding_char)[0])
         else:
             self.index_mapper = lambda x: BitArray(bin=x.split(self.padding_char)[0]).uint # By default, we assume a binary alphabet with our index mapping bitstrings to ints
 
