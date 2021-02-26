@@ -15,6 +15,7 @@ class LHClient(FreqOracleClient):
 
         Args:
             epsilon: float - The privacy budget
+            d: integer - Domain size
             g: Optional integer - The domain [g] = {1,2,...,g} that data is hashed to, 2 by default (binary local hashing)
             use_olh: Optional boolean - if set to true uses Optimised Local Hashing (OLH) i.e g is set to round(e^epsilon + 1)
             index_mapper: Optional function - maps data items to indexes in the range {0, 1, ..., d-1} where d is the size of the data domain
@@ -22,9 +23,9 @@ class LHClient(FreqOracleClient):
         super().__init__(epsilon, d, index_mapper=index_mapper)
         self.use_olh = use_olh
         self.g =g
-        self.update_params(epsilon, d, g, index_mapper)
+        self.update_params(epsilon=epsilon, d=d, g=g, index_mapper=index_mapper)
 
-    def update_params(self, epsilon=None, d=None, g=None, index_mapper=None):
+    def update_params(self, epsilon=None, d=None, use_olh=None, g=None, index_mapper=None):
         """
 
         Args:
@@ -34,6 +35,9 @@ class LHClient(FreqOracleClient):
             index_mapper: optional - function
         """
         super().update_params(epsilon, d, index_mapper) # Updates core params
+
+        # If use_olh is true, then update the g parameter
+        self.use_olh = use_olh if use_olh is not None else self.use_olh
 
         # Updates g and probs
         self.g = g if g is not None else self.g
@@ -48,7 +52,7 @@ class LHClient(FreqOracleClient):
         """
         Used internally to perturb data using local hashing.
 
-        Will hash the user's data item and then peturb it with probabilities that
+        Will hash the user's data item and then perturb it with probabilities that
         satisfy epsilon local differential privacy. Local hashing is explained
         in more detail here: https://www.usenix.org/system/files/conference/usenixsecurity17/sec17-wang-tianhao.pdf
 

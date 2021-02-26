@@ -31,7 +31,6 @@ server_the = HEServer(epsilon=epsilon, d=d, use_the=is_the)
 server_hr = HadamardResponseServer(epsilon, d)
 client_hr = HadamardResponseClient(epsilon, d, server_hr.get_hash_funcs())
 
-
 # Apple's Count Mean Sketch (CMS)
 k = 128 # 128 hash functions
 m = 1024 # Each hash function maps to the domain {0, ... 1023}
@@ -92,6 +91,8 @@ print("Optimised Local Hashing (OLH) Variance: ", mse_arr[0])
 print("Optimised Unary Encoding (OUE) Variance: ", mse_arr[1])
 print("Threshold Histogram Encoding (THE) Variance: ", mse_arr[2])
 print("Hadamard response (HR) Variance:", mse_arr[3])
+print(sum(hr_estimates))
+
 print("Apple CMS Variance:", mse_arr[4])
 print("\n")
 print("Original Frequencies:", original_freq)
@@ -105,8 +106,8 @@ print("Note: We round estimates to the nearest integer")
 
 # ------------------------------ Heavy Hitters - PEM Simulation -------------------------
 
-pem_client = PEMClient(epsilon=3, domain_size=6, start_length=2, segment_length=2)
-pem_server = PEMServer(epsilon=3, domain_size=6, start_length=2, segment_length=2)
+pem_client = PEMClient(epsilon=3, start_length=2, max_string_length=6, fragment_length=2)
+pem_server = PEMServer(epsilon=3, start_length=2, max_string_length=6, fragment_length=2)
 
 s1 = "101101"
 s2 = "111111"
@@ -122,5 +123,9 @@ for index, item in enumerate(data):
     priv = pem_client.privatise(item)
     pem_server.aggregate(priv)
 
-top_k = pem_server.find_top_k(3)
-print("Top 3 strings found are:", top_k)
+# Can either specify top-k based or threshold based
+    # Threshold of 0.05 means we find any possible heavy hitters that have a frequency >= 5%
+    # Top-k of three means we try to find the top-3 most frequent strings
+
+heavy_hitters, frequencies = pem_server.find_heavy_hitters(threshold=0.05)
+print("Top strings found are:", heavy_hitters, " with frequencies", frequencies)

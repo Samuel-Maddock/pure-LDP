@@ -21,9 +21,9 @@ class LHServer(FreqOracleServer):
         self.set_name("LHServer")
         self.g = g
         self.use_olh = use_olh
-        self.update_params(epsilon, d, g, index_mapper)
+        self.update_params(epsilon=epsilon, d=d, g=g, index_mapper=index_mapper)
 
-    def update_params(self, epsilon=None, d=None, g=None, index_mapper=None):
+    def update_params(self, epsilon=None, d=None, use_olh=None, g=None, index_mapper=None):
         """
         Updates LHServer parameters, will reset any aggregated/estimated data
         Args:
@@ -34,11 +34,16 @@ class LHServer(FreqOracleServer):
         """
         super().update_params(epsilon, d, index_mapper)
 
+        # If use_olh is true, then update the g parameter
+        if use_olh is not None:
+            self.use_olh = use_olh
+
+        self.g = g if g is not None else self.g
+        if self.use_olh is True:
+            self.g = int(round(math.exp(self.epsilon))) + 1
+
         # Update probs and g
         if epsilon is not None:
-            if self.use_olh is True:
-                self.g = int(round(math.exp(self.epsilon))) + 1
-
             self.p = math.exp(self.epsilon) / (math.exp(self.epsilon) + self.g - 1)
 
     def aggregate(self, priv_data):
@@ -47,7 +52,6 @@ class LHServer(FreqOracleServer):
 
         Args:
             priv_data: Privatised data of the form returned from UEClient.privatise
-            seed: kwarg - The seed of the user's hash function, must be passed as a keyword arg
         """
         seed = priv_data[1]
         priv_data = priv_data[0]

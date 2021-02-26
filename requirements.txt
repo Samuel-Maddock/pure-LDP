@@ -3,3 +3,5 @@ numpy
 scipy
 bitstring
 bitarray
+matplotlib
+seaborn

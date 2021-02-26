@@ -1,101 +1,122 @@
 from pure_ldp.frequency_oracles.local_hashing import LHServer
 from pure_ldp.core import FreqOracleServer
+from pure_ldp.heavy_hitters._hh_server import HeavyHitterServer
 
 import math
-import itertools
 import copy
 import numpy as np
 
-from bitstring import BitArray
 from collections import Counter
 
-
-class PEMServer:
-    def __init__(self, epsilon, domain_size, start_length, segment_length, FOServer=None):
+class PEMServer(HeavyHitterServer):
+    def __init__(self, epsilon, start_length, max_string_length, fragment_length, alphabet=None, index_mapper=None, fo_server=None, padding_char="*", estimator_norm=0):
         """
-
         Args:
             epsilon: float privacy budget
-            domain_size: max string length
             start_length: starting size of the fragment
-            segment_length: length to increase fragment by on each round
-            FOServer: instance of FreqOracleServer to aggregate and estimate the heavy hitters
+            max_string_length (int): maximum size of the strings to find
+            fragment_length (int): The length to increase the fragment by on each iteration
+            alphabet (optional list): The alphabet over which we are privatising strings
+            index_mapper (optional func): Index map function
+            fo_server: instance of FreqOracleServer to aggregate and estimate the heavy hitters
+            padding_char (optional str): The character used to pad strings to a fixed length
+            estimator_norm (optional int): The normalisation type for the server estimators
+                   0 - No Norm
+                   1 - Additive Norm
+                   2 - Prob Simplex
+                   3 (or otherwise) - Threshold cut
         """
-        self.epsilon = epsilon
-        self.domain_size = domain_size
-        self.segment_length = segment_length
-        self.start_length = start_length
 
-        self.g = math.ceil((self.domain_size - self.start_length) / self.segment_length)
+        super(PEMServer, self).__init__(epsilon, start_length, max_string_length, fragment_length, alphabet, index_mapper, padding_char, estimator_norm)
+        self.g = math.ceil((self.max_string_length - self.start_length) / self.fragment_length)
         self.oracles = []
-        self.n = 0
 
-        if isinstance(FOServer, FreqOracleServer):
+        if isinstance(fo_server, FreqOracleServer):
             for i in range(0, self.g):
-                oracle = copy.deepcopy(FOServer)
-                d = 2 ** (self.start_length + (i + 1) * self.segment_length)
-                oracle.update_params(d=d,
-                                     index_mapper=lambda x: x) # Some oracles need a domain size
+                oracle = copy.deepcopy(fo_server)
+                d = len(self.alphabet) ** (self.start_length + (i + 1) * self.fragment_length)
+                try:
+                    oracle.update_params(d=d, index_mapper=self.index_mapper) # Some oracles need a domain size
+                except TypeError:
+                    oracle.update_params(index_mapper=self.index_mapper)
+
                 oracle.reset()
                 self.oracles.append(oracle)
         else:
             for i in range(0, self.g):
                 self.oracles.append(
-                    LHServer(self.epsilon, 2 ** (self.start_length + (i + 1) * self.segment_length), use_olh=True, index_mapper= lambda x:x))
+                    LHServer(self.epsilon, len(self.alphabet) ** (self.start_length + (i + 1) * self.fragment_length), use_olh=True, index_mapper=self.index_mapper))
 
-    def aggregate(self, pem_data):
+    def aggregate(self, privatised_hh_data):
         """
+        Aggregate data privatised by PEMClient
 
         Args:
-            privatised_fragment: a privatised bit string from PEMClient
-            group: the group number
+            privatised_hh_data (tuple): a privatised string from PEMClient of the form (privatised_fragment, group)
         """
-        privatised_fragment, group = pem_data
+        privatised_fragment, group = privatised_hh_data
         self.oracles[group].aggregate(privatised_fragment)
         self.n += 1
 
-    def _estimate_top_k(self, oracle, candidates, k):
+    def _estimate_freq_fragments(self, oracle, candidates, k=None, threshold=None):
         """
 
+        Estimate the frequency of a set of candidate fragments using the oracle that is passed
+
         Args:
-            oracle: frequncy oracle (FreqOracleServer instance)
+            oracle: frequency oracle (FreqOracleServer instance)
             candidates: a list of candidate strings
             k: int - used to find the top k most frequent strings
+            threshold (float): Used to find heavy hitters based on threshold frequency
 
-        Returns:
+        Returns: Iterable of (candidate, frequency) pairs containing
 
         """
-        # TODO: Faster/nicer way to do this?
-        top_k, _ = zip(*Counter(dict(zip(candidates, oracle.estimate_all(candidates, suppress_warnings=True)))).most_common(k))
-        return top_k
+        estimates = dict(zip(candidates, self.g* np.array(oracle.estimate_all(candidates, suppress_warnings=True, normalization=self.estimator_norm))))
 
-    def find_top_k(self, k):
+        if k is not None:
+            return Counter(estimates).most_common(k) # Find top-k frequent fragments
+        else:
+            return filter(lambda item: (item[1])/self.n >= threshold, estimates.items()) # Find possible fragments that are greater frequency than a certain threshold
+
+    def find_heavy_hitters(self, k=None, threshold=None):
         """
+        Finds the heavy hitters either based on top-k or a threshold
 
         Args:
             k: int - used to find the top k most frequent strings
+            threshold (float): Threshold value (as a decimal)
 
-        Returns: list of top-k frequent candidates, and a list of there estimated frequencies
-
+        Returns: list of top-k frequent candidates (or > threshold candidates),
+                    and a list of their estimated frequencies
         """
-        fragment_size = self.start_length + (0 + 1) * self.segment_length
-        candidates = range(0, 2 ** fragment_size)
-        top_k = self._estimate_top_k(self.oracles[0], candidates, k)
 
-        freq_candidates = list(map(lambda x: BitArray(uint=x, length=fragment_size).bin, top_k))
+        if k is None and threshold is None:
+            k = 10
+
+        # First group estimation
+        fragment_size = self.start_length + self.fragment_length
+        starting_fragments = self._generate_fragments(fragment_size)
+
+        freq_candidates = list(self._estimate_freq_fragments(self.oracles[0], starting_fragments, k, threshold))
+        # Set of possible fragments to be added at each stage
+        inc_frags = self._generate_fragments()
 
         for i in range(1, self.g):
-            fragment_size = self.start_length + (i + 1) * self.segment_length
-
-            frags = [''.join(comb) for comb in itertools.product(["0", "1"], repeat=self.segment_length)]
-
+            # Form new fragments
             candidates = []
-            for frag in frags:
-                candidates.extend([BitArray(bin=bs + frag).uint for bs in freq_candidates])
+            for frag in inc_frags:
+                new_frags = [bs[0] + frag for bs in freq_candidates]
+                candidates.extend(new_frags)
+            freq_candidates = self._estimate_freq_fragments(self.oracles[i], candidates, k, threshold) # Estimate top k (or threshold) of the new fragments
 
-            top_k = self._estimate_top_k(self.oracles[i], candidates, k)
+        if threshold:
+            freq_candidates = sorted(freq_candidates, key=lambda item: item[1], reverse=True)
+        try:
+            heavy_hitters, frequencies = zip(*list(freq_candidates))
+        except ValueError:
+            heavy_hitters = []
+            frequencies  = []
 
-            freq_candidates = list(map(lambda x: BitArray(uint=x, length=fragment_size).bin, top_k))
+        return heavy_hitters, frequencies
 
-        freqs = self.g * np.array(self.oracles[self.g-1].estimate_all([BitArray(bin=x).uint for x in freq_candidates], suppress_warnings=True))
-        return freq_candidates, freqs

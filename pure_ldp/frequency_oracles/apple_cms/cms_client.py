@@ -16,8 +16,9 @@ class CMSClient(FreqOracleClient):
             is_hadamard (optional bool): If true, uses Hadamard Count Mean Sketch (HCMS)
         """
         super().__init__(epsilon, None)
-        self.update_params(hash_funcs, m, epsilon)
+        self.sketch_based = True
         self.is_hadamard = is_hadamard
+        self.update_params(hash_funcs, m, epsilon)
 
         if self.is_hadamard:
             self.had = hadamard(self.m)
@@ -39,7 +40,10 @@ class CMSClient(FreqOracleClient):
         self.m = m if m is not None else self.m
 
         if epsilon is not None:
-            self.prob = 1 / (1 + math.pow(math.e, self.epsilon / 2))
+            if self.is_hadamard:
+                self.prob = 1 / (1 + math.pow(math.e, self.epsilon))
+            else:
+                self.prob = 1 / (1 + math.pow(math.e, self.epsilon / 2))
 
     def _one_hot(self, data):
         """
