@@ -16,6 +16,7 @@ class CMSClient(FreqOracleClient):
             is_hadamard (optional bool): If true, uses Hadamard Count Mean Sketch (HCMS)
         """
         super().__init__(epsilon, None)
+        self.sketch_based = True
         self.is_hadamard = is_hadamard
         self.update_params(hash_funcs, m, epsilon)
 

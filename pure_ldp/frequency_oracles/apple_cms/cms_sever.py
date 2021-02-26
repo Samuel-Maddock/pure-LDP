@@ -18,6 +18,7 @@ class CMSServer(FreqOracleServer):
             index_mapper (optional func): Index map function
         """
         super().__init__(epsilon, None, index_mapper)
+        self.sketch_based = True
         self.is_hadamard = is_hadamard
         self.update_params(k,m, epsilon, index_mapper=None)
         self.hash_funcs = generate_hash_funcs(k,m)
