@@ -4,5 +4,7 @@ build
 dist
 pure_ldp.egg-info
 pure_ldp/development
-pure_ldp/simulations/plots
 pure_ldp/simulations/data
+pure_ldp/simulations/plots/metrics
+*.eps
+*.txt
