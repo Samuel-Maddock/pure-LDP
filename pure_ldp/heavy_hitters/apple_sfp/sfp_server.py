@@ -3,7 +3,6 @@ from collections import Counter
 
 import numpy as np
 import itertools
-import pathos.pools as pp
 import copy
 
 from pure_ldp.core import FreqOracleServer
