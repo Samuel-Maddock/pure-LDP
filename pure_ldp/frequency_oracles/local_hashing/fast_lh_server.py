@@ -34,9 +34,17 @@ class FastLHServer(LHServer):
         else:
             self.hash_matrix = hash_matrix
 
-    def update_params(self, epsilon=None, d=None, k=None, use_olh=None, g=None, index_mapper=None):
+    def update_params(self, epsilon=None, d=None, k=None, use_olh=None, g=None, index_mapper=None, update_hash_matrix=True):
         super().update_params(epsilon=epsilon, d=d, use_olh=use_olh, g=g, index_mapper=index_mapper)
         self.k = k if k is not None else self.k
+
+        # If any of the main parameters are updated the hash_matrix needs to be updated... this is quite slow
+        if epsilon is not None or self.g is not None or self.k is not None or self.d is not None and update_hash_matrix is True:
+            matrix = np.empty((self.k, self.d))
+            for i in range(0, self.k):
+                for j in range(0, self.d):
+                    matrix[i][j] = xxhash.xxh32(str(j), seed=i).intdigest() % self.g
+            self.hash_matrix = matrix
 
     def aggregate(self, priv_data):
         """
