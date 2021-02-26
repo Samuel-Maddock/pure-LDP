@@ -20,17 +20,17 @@ class TreeHistClient(HeavyHitterClient):
 
         self.num_n_grams = int(max_string_length / fragment_length)  # Number of N-grams
 
-        # TODO: Deal with situation where the empty char is in the alphabet...
+        if padding_char in alphabet:
+            raise RuntimeError("TreeHistClient was passed a padding character that is in the provided alphabet. The padding character must not be in the alphabet.")
+
+        self.client.update_params(epsilon=epsilon/2, index_mapper=self.index_mapper)
 
         self.word_estimator = copy.deepcopy(self.client)
-        self.word_estimator.update_params(epsilon=epsilon/2, index_mapper=self.index_mapper)
-
         self.fragment_estimator = copy.deepcopy(self.client)
-        self.fragment_estimator.update_params(epsilon=epsilon/2, index_mapper=self.index_mapper)
 
         try:
+            # TODO: Rework this - This is slow for freq oracles that scale with d...
             self.word_estimator.update_params(d=len(self.alphabet) ** self.max_string_length)
-            # TODO: This is slow for freq oracles that scale with d...
             self.fragment_estimator.update_params(d=len(self.alphabet) ** self.max_string_length)
         except TypeError:
             pass

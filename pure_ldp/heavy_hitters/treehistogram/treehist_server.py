@@ -30,21 +30,22 @@ class TreeHistServer(HeavyHitterServer):
         super().__init__(epsilon, 0, max_string_length, fragment_length, alphabet, index_mapper, padding_char, estimator_norm)
         self.num_n_grams = int(max_string_length / fragment_length)  # Number of N-grams
 
-        # TODO: Deal with situation where the padding char is in the alphabet...
+        if padding_char in alphabet:
+            raise RuntimeError("TreeHistServer was passed a padding character that is in the provided alphabet. The padding character must not be in the alphabet.")
 
         if isinstance(fo_server, FreqOracleServer):
             server = fo_server
         else:
             server = LHServer(self.epsilon / 2, d=None, use_olh=True)
 
+        server.update_params(epsilon=self.epsilon/2, index_mapper=self.index_mapper)
+
         self.word_estimator = copy.deepcopy(server)
-        self.word_estimator.update_params(epsilon=self.epsilon / 2, index_mapper=self.index_mapper)
         self.fragment_estimator = copy.deepcopy(server)
-        self.fragment_estimator.update_params(epsilon=self.epsilon / 2, index_mapper=self.index_mapper)
 
         try:
-            self.word_estimator.update_params(d=len(self.alphabet) ** self.max_string_length)
             # TODO: This is slow for freq oracles that scale with d...
+            self.word_estimator.update_params(d=len(self.alphabet) ** self.max_string_length)
             self.fragment_estimator.update_params(d=len(self.alphabet) ** self.max_string_length)
         except TypeError:
             pass
@@ -83,9 +84,9 @@ class TreeHistServer(HeavyHitterServer):
         word_queue = deque(list_n_grams)
         candidate_strings = {}
 
-        if k:
+        if k is not None:
             for i in range(0, self.num_n_grams):
-                fragments = zip(self.fragment_estimator.estimate_all(word_queue)*scaling_factor, word_queue, normalization=self.estimator_norm)
+                fragments = zip(self.fragment_estimator.estimate_all(word_queue, normalization=self.estimator_norm)*scaling_factor, word_queue)
                 top_k = heapq.nlargest(k, fragments)
                 word_queue = []
                 for item in top_k:
@@ -102,7 +103,8 @@ class TreeHistServer(HeavyHitterServer):
                 current_prefix_after_stripping_empty = current_prefix.replace(self.padding_char, '')
 
                 freq_for_current_prefix = int(self.fragment_estimator.estimate(current_prefix) * scaling_factor)
-                if freq_for_current_prefix < threshold:
+
+                if freq_for_current_prefix/self.n < threshold:
                     continue
 
                 if len(current_prefix_after_stripping_empty) == word_length:
@@ -112,6 +114,5 @@ class TreeHistServer(HeavyHitterServer):
                 for gram in n_gram_set:
                     toAdd = current_prefix_after_stripping_empty + gram + self.padding_char * (word_length - (len(current_prefix_after_stripping_empty) + self.fragment_length))
                     word_queue.append(toAdd)
-
 
         return list(candidate_strings.keys()), self.word_estimator.estimate_all(candidate_strings.keys(), normalization=self.estimator_norm)
