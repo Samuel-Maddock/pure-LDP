@@ -38,7 +38,7 @@ class PEMClient(HeavyHitterClient):
         # Must calculate domain size based on the user's group and update client params
         d = len(self.alphabet) ** (self.start_length + (group + 1) * self.fragment_length)
         try:
-            self.client.update_params(d=d) # TODO: Make sure all frequency oracles have a working update_params...
+            self.client.update_params(d=d)
         except TypeError: # Oracles like CMS don't have a d parameter to update
             pass
 

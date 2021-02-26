@@ -96,32 +96,22 @@ class PEMServer(HeavyHitterServer):
 
         # First group estimation
         fragment_size = self.start_length + self.fragment_length
-        # print("Generating starting fragments...")
-        # print(fragment_size)
-        # print(self.max_string_length)
-        # print(threshold)
-        # print(k)
-        # print(self.alphabet)
-
         starting_fragments = self._generate_fragments(fragment_size)
-        freq_candidates = list(self._estimate_freq_fragments(self.oracles[0], starting_fragments, k, threshold))
 
+        freq_candidates = list(self._estimate_freq_fragments(self.oracles[0], starting_fragments, k, threshold))
         # Set of possible fragments to be added at each stage
         inc_frags = self._generate_fragments()
 
         for i in range(1, self.g):
             # Form new fragments
-            #print("Stage:", i+1)
             candidates = []
             for frag in inc_frags:
                 new_frags = [bs[0] + frag for bs in freq_candidates]
                 candidates.extend(new_frags)
-
             freq_candidates = self._estimate_freq_fragments(self.oracles[i], candidates, k, threshold) # Estimate top k (or threshold) of the new fragments
 
         if threshold:
             freq_candidates = sorted(freq_candidates, key=lambda item: item[1], reverse=True)
-
         try:
             heavy_hitters, frequencies = zip(*list(freq_candidates))
         except ValueError:
