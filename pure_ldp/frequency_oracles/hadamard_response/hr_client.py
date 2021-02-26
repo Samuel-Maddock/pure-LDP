@@ -1,7 +1,6 @@
 from pure_ldp.core import FreqOracleClient
 from pure_ldp.frequency_oracles.hadamard_response.internal import k2k_hadamard
-import math
-
+import copy
 
 class HadamardResponseClient(FreqOracleClient):
     def __init__(self, epsilon, d, hash_funcs, index_mapper=None):
@@ -31,7 +30,7 @@ class HadamardResponseClient(FreqOracleClient):
             if self.epsilon <= 1:
                 self.hr = k2k_hadamard.Hadamard_Rand_high_priv(self.d, self.epsilon, encode_acc=encode_acc) # hadamard_response high privacy regime
             elif self.epsilon > 1 and d is None and hash_funcs is None:
-                hash_funcs = self.hr.permute
+                hash_funcs = copy.deepcopy(self.hr.permute)
                 self.hr = k2k_hadamard.Hadamard_Rand_general_original(self.d, self.epsilon, encode_acc=encode_acc) # hadamard_response (general privacy)
                 self.hr.permute = hash_funcs
             elif self.epsilon > 1 and hash_funcs is not None:

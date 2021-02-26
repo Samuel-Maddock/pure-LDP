@@ -2,7 +2,6 @@ from pure_ldp.core import FreqOracleServer
 from pure_ldp.frequency_oracles.hadamard_response.internal import k2k_hadamard
 import math
 
-
 class HadamardResponseServer(FreqOracleServer):
     def __init__(self, epsilon, d, index_mapper=None):
         """
@@ -40,11 +39,18 @@ class HadamardResponseServer(FreqOracleServer):
         """
         super().update_params(epsilon, d, index_mapper)
         encode_acc = 0
+
         if epsilon is not None:
-            if self.epsilon <= 1:
-                self.hr = k2k_hadamard.Hadamard_Rand_high_priv(d, self.epsilon, encode_acc=encode_acc) # hadamard_response
-            else:
-                self.hr = k2k_hadamard.Hadamard_Rand_general_original(d, self.epsilon, encode_acc=encode_acc)
+            if self.epsilon <= 1 and d is None:
+                self.hr.pri_para = 1 / (1 + math.exp(self.epsilon))  # flipping probability to maintain local privacy
+                self.hr.exp = math.exp(self.epsilon)  # privacy parameter
+            elif self.epsilon > 1 and d is None:
+                self.hr.pri_para = 1 / (1 + math.exp(self.epsilon))  # flipping probability to maintain local privacy
+                self.hr.exp = math.exp(self.epsilon)  # privacy parameter
+            elif self.epsilon > 1:
+                self.hr = k2k_hadamard.Hadamard_Rand_general_original(self.d, self.epsilon, encode_acc=encode_acc) # hadamard_response (general privacy)
+            elif self.epsilon <= 1:
+                self.hr = k2k_hadamard.Hadamard_Rand_high_priv(self.d, self.epsilon, encode_acc=encode_acc) # hadamard_response (general privacy)
 
     def aggregate(self, data):
         """
@@ -61,7 +67,10 @@ class HadamardResponseServer(FreqOracleServer):
         Returns: estimated data
 
         """
-        self.estimated_data = self.hr.decode_string(self.aggregated_data, normalization=-1) * self.n # no normalisation
+        if self.d > 128:
+            self.estimated_data = self.hr.decode_string(self.aggregated_data, normalization=-1, iffast=1) * self.n # no normalisation
+        else:
+            self.estimated_data = self.hr.decode_string(self.aggregated_data, normalization=-1, iffast=0) * self.n # no normalisation
         return self.estimated_data
 
     def estimate(self, data, suppress_warnings=False):

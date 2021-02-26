@@ -393,6 +393,7 @@ class Hadamard_Rand_general_original:
             freq_block = np.zeros((parts+1)*self.partsz)
         
             for i in range(0, parts+1):
+
                 Trans = FWHT_A(self.partsz, freq[i*self.partsz: (i+1)*self.partsz])
                 freq_block[i] = Trans[0]
                 freq_S[i*(self.partsz-1): (i+1)*(self.partsz-1)] = (Trans[1:self.partsz] + Trans[0])/float(2) 
@@ -431,7 +432,7 @@ class Hadamard_Rand_general_original:
         return dist1
 
     # Debugging methods, generate_dist is the first half of decode_string
-    def generate_dist(self, out_list,iffast = 1, normalization = 0):
+    def generate_dist(self, out_list, iffast = 1, normalization = 0):
         l = len(out_list)
         count,edges = np.histogram(out_list,range(self.outsz+1))
         freq = count/float(l)
