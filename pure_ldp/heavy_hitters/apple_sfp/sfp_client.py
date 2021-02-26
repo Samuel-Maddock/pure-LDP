@@ -37,31 +37,34 @@ class SFPClient(HeavyHitterClient):
         word_d = len(self.alphabet) ** self.max_string_length
         fragment_d = len(self.alphabet) ** self.fragment_length * self.hash_length
 
-        def fragment_map(x):
-            split = x.split("_")
-            hash_num, frag = split[0], split[1]
-            return int(hash_num) * (self.index_mapper(frag) + 1)
+        # For non-sketching based FOs and also if the domain is binary
+        if fo_client.sketch_based:
+            fragment_map = self.index_mapper
+        else:
+            def fragment_map(x):
+                split = x.split("_")
+                hash_num, frag = split[0], split[1]
+                return int(hash_num) * (self.index_mapper(frag) + 1)
 
         self.word_client.update_params(epsilon=epsilon / 2, index_mapper=self.index_mapper)
         self.fragment_client.update_params(epsilon=epsilon / 2, index_mapper=fragment_map)
 
         try:
-            self.word_client.update_params(d=word_d)
             # TODO: This is slow for freq oracles that scale with d...
+            self.word_client.update_params(d=word_d)
             self.fragment_client.update_params(d=fragment_d)
         except TypeError:
             pass
 
-    # Used to create SFP fragments
-    # Generic method used by other frequency oracles
     def _create_fragment(self, string):
         """
+        Used to create SFP fragments which are formed from hashes of the whole word and a random substring of the word
+            of lengeth self.fragment_length
 
         Args:
-            string:
+            string: The string to create a fragment from
 
-        Returns:
-
+        Returns: (r, string,l) - r is the fragment, string is the word itself and l is the index of the substring chosen to form the fragment
         """
 
         fragment_indices = np.arange(0, len(string), step=self.fragment_length)
@@ -72,11 +75,12 @@ class SFPClient(HeavyHitterClient):
 
     def privatise(self, user_string):
         """
+        Privatises a user's string for SFP
 
         Args:
-            string:
+            string: User's string to privatise for SFP
 
-        Returns:
+        Returns: (priv_fragment, priv_world, l) Privatised fragment, Privatised String and the index of the substring used to form the fragment
 
         """
         padded_string = self._pad_string(user_string)

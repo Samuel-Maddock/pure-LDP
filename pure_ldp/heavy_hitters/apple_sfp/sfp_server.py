@@ -52,29 +52,25 @@ class SFPServer(HeavyHitterServer):
         self.word_fo.update_params(index_mapper=self.index_mapper)
 
         if frag_server is not None:
-            fo_server = frag_server # Allows the option to use a different FO for fragments vs words
+            fo_server = frag_server # TODO: Check this works - Allows the option to use a different FO for fragments vs words
+
+        if fo_server.sketch_based:
+            fragment_map = self.index_mapper
+        else:
+            def fragment_map(x):
+                split = x.split("_")
+                hash_num, frag = split[0], split[1]
+                return int(hash_num) * (self.index_mapper(frag) + 1)
 
         try:
-            self.word_fo.update_params(d=fragment_d)
-        except TypeError:
-            pass
-
-        def fragment_map(x):
-            split = x.split("_")
-            hash_num, frag = split[0], split[1]
-            return int(hash_num) * (self.index_mapper(frag)+1)
-
-        fo_server.update_params(d=fragment_d, index_mapper=fragment_map)
-
-        try:
-            fo_server.update_params(d=fragment_d)
+            self.word_fo.update_params(d=fragment_d, index_mapper=self.index_mapper)
+            fo_server.update_params(d=fragment_d, index_mapper=fragment_map)
         except TypeError:
             pass
 
         for i in range(0, self.group_size):
             oracle = copy.deepcopy(fo_server)
             self.fragment_fo_list.append(oracle)
-
 
     def aggregate(self, privatised_hh_data):
         """
@@ -88,7 +84,6 @@ class SFPServer(HeavyHitterServer):
         index = int(l/self.fragment_length)
         self.fragment_fo_list[index].aggregate(priv_fragment)
         self.n += 1
-
 
     def _split_fragment(self, fragment):
         fragment_split = fragment.split("_", 1)
@@ -119,18 +114,12 @@ class SFPServer(HeavyHitterServer):
 
         D = []
 
-        # TODO: This might cause issues
-        # self.alphabet.add(self.padding_char)
+        alphabet = copy.deepcopy(self.alphabet)
+        alphabet.add(self.padding_char)
 
-        fragments = self._generate_fragments(self.alphabet)
+        fragments = self._generate_fragments(alphabet)
 
         frequency_dict = defaultdict(lambda: Counter())
-
-        # Computationally checking the frequency estimates of every possible fragment is slow
-        # We use python multithreading to make this quicker
-        # We use the pathos library since the standard multiprocessing library doesn't allow pool maps in class methods
-
-        pool = pp.ProcessPool()
 
         def estimate_fragments(key, frag_estimator):
             frag_dict = dict()
@@ -140,9 +129,7 @@ class SFPServer(HeavyHitterServer):
 
             return key, Counter(frag_dict)
 
-        # estimate_fragments = lambda key, frag_estimator: (key, Counter({k:v for k,v in map(lambda x: (x, frag_estimator(x)), fragments)}))
-
-        pool_map = pool.uimap(estimate_fragments, range(0,self.max_string_length, self.fragment_length), fragment_estimators)
+        pool_map = map(estimate_fragments, range(0,self.max_string_length, self.fragment_length), fragment_estimators)
 
         for item in pool_map:
             frequency_dict[item[0]] = item[1]
@@ -152,10 +139,10 @@ class SFPServer(HeavyHitterServer):
         fragment_indices = np.arange(0, self.max_string_length, step=self.fragment_length)
 
         for l in fragment_indices:
-            if k is not None:
+            if k is not None: # If k is present then find the top-k fragments to build up the heavy hitters
                 fragments = frequency_dict.get(l).most_common(k)
-            else:
-                fragments = filter(lambda x: x[1] >= threshold, frequency_dict.get(l).items())
+            else: # Otherwise we use a threshold to build up heavy hitters
+                fragments = filter(lambda x: x[1]/self.n >= threshold, frequency_dict.get(l).items())
 
             for fragment in fragments:
                 key, value = self._split_fragment(fragment[0])
@@ -167,8 +154,6 @@ class SFPServer(HeavyHitterServer):
             if len(dictionary.keys()) == int(self.max_string_length / self.fragment_length):
                 D += list(map(lambda x: str().join(x), itertools.product(*fragment_list)))
 
-        # TODO: return padding char if using it
-        # return D, freq_oracle
         heavy_hitters = D
         frequencies = freq_oracle.estimate_all(heavy_hitters, normalization=self.estimator_norm)
 
