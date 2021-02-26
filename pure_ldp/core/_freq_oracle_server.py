@@ -69,6 +69,7 @@ class FreqOracleServer:
         """
         if not suppress_warnings:
             if self.n < 10000:
+                # TODO: This seems to warn too many times in HH + FLH
                 warnings.warn(self.name + " has only aggregated small amounts of data (n=" + str(self.n) +
                               ") estimations may be highly inaccurate", RuntimeWarning)
             if self.epsilon < 1:
@@ -158,7 +159,6 @@ class FreqOracleServer:
             for i,index in enumerate(sorted_index):
                 total += estimates[index]
                 if total > self.n:
-                    print("Threshold Value:", estimates[index])
                     break
 
             for j in range(i, len(sorted_index)):
