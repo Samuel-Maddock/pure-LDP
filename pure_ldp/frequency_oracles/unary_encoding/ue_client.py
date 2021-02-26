@@ -1,5 +1,6 @@
 import numpy as np
 import math
+import random
 
 from pure_ldp.core import FreqOracleClient
 
@@ -51,7 +52,8 @@ class UEClient(FreqOracleClient):
 
         """
         oh_vec = np.random.choice([1, 0], size=self.d, p=[self.q, 1-self.q])  # If entry is 0, flip with prob q
-        oh_vec[index] = np.random.choice([1, 0], p=[self.p, 1-self.p]) # If entry is 1, keep as 1 with prob p
+        if random.random() < self.p:
+            oh_vec[index] = 1
         return oh_vec
 
     def privatise(self, data):
