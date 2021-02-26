@@ -18,7 +18,7 @@ class DEClient(FreqOracleClient):
         """
         super().update_params(epsilon, d, index_mapper)
 
-        if epsilon is not None: # If epsilon changes, update probs
+        if epsilon is not None or d is not None: # If epsilon changes, update probs
             self.const = math.pow(math.e, self.epsilon) + self.d - 1
             self.p = (math.pow(math.e, self.epsilon)) / (self.const)
             self.q = 1/self.const

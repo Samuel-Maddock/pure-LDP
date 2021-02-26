@@ -22,7 +22,7 @@ class DEServer(FreqOracleServer):
             index_mapper: optional - index_mapper
         """
         super().update_params(epsilon, d, index_mapper)
-        if epsilon is not None:
+        if epsilon is not None or d is not None:
             self.const = math.pow(math.e, self.epsilon) + self.d - 1
             self.p = (self.const-self.d+1) / (self.const)
             self.q = 1/self.const
