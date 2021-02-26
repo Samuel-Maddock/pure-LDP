@@ -13,7 +13,7 @@ import statsmodels.api as sm
 
 
 class RAPPORServer(FreqOracleServer):
-    def __init__(self, f, m, k, d, num_of_cohorts=8, index_mapper=None, reg_const=None,lasso=False):
+    def __init__(self, f, m, k, d, num_of_cohorts=8, index_mapper=None, reg_const=None, lasso=False):
         """
         Server frequency oracle for RAPPOR
 
@@ -65,9 +65,10 @@ class RAPPORServer(FreqOracleServer):
 
         if k is not None or num_of_cohorts is not None:
             self.hash_family = self._generate_hash_funcs()
-            raise RuntimeWarning("RAPPORServer hash functions were reset due to a change in num_of_cohorts or k. RAPPORClient hash functions should be updated manually otherwise you will face inconsistencies")
+            raise RuntimeWarning(
+                "RAPPORServer hash functions were reset due to a change in num_of_cohorts or k. RAPPORClient hash functions should be updated manually otherwise you will face inconsistencies")
 
-        self.reset() # Changing parameters will reset RAPPORs state
+        self.reset()  # Changing parameters will reset RAPPORs state
 
     def reset(self):
         super().reset()
@@ -112,16 +113,19 @@ class RAPPORServer(FreqOracleServer):
         y = self._create_y()
         X = self._create_X()
 
-        model = ElasticNet(positive=True, alpha=self.reg_const,
-                           l1_ratio=0, fit_intercept=True,
-                           max_iter=5000)  # non-negative least-squares with L2 regularisation to prevent overfitting
+        if self.reg_const == 0:
+            model = LinearRegression(positive=True, fit_intercept=False)
+        else:
+            model = ElasticNet(positive=True, alpha=self.reg_const,
+                               l1_ratio=0, fit_intercept=False,
+                               max_iter=10000)  # non-negative least-squares with L2 regularisation to prevent overfitting
 
         if self.d > 1000 or self.lasso:  # If d is large, we perform feature selection to reduce computation time
-            print("d is large, fitting LASSO to reduce d")
+            # print("d is large, fitting LASSO to reduce d")
             lasso_model = Lasso(alpha=0.8, positive=True)
             lasso_model.fit(X, y)
             indexes = np.nonzero(lasso_model.coef_)[0]
-            print("LASSO fit,", str(len(indexes)), "features selected")
+            # print("LASSO fit,", str(len(indexes)), "features selected")
             X_red = X[:, indexes]
             model.fit(X_red, y)
             self.estimated_data[indexes] = model.coef_ * self.num_of_cohorts
@@ -177,7 +181,7 @@ class RAPPORServer(FreqOracleServer):
         Returns: The equivalent privacy parameter f
 
         """
-        return round(1/(0.5*math.exp(epsilon/2)+0.5), 2)
+        return round(1 / (0.5 * math.exp(epsilon / 2) + 0.5), 2)
 
     def convert_f_to_eps(self, f, k):
         """
@@ -190,4 +194,4 @@ class RAPPORServer(FreqOracleServer):
         Returns: Epsilon value
 
         """
-        return math.log(((1-0.5*f) / (0.5*f))**(2*k))
+        return math.log(((1 - 0.5 * f) / (0.5 * f)) ** (2 * k))
