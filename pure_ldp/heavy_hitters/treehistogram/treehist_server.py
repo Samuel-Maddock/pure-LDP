@@ -30,8 +30,8 @@ class TreeHistServer(HeavyHitterServer):
         super().__init__(epsilon, 0, max_string_length, fragment_length, alphabet, index_mapper, padding_char, estimator_norm)
         self.num_n_grams = int(max_string_length / fragment_length)  # Number of N-grams
 
-        if padding_char in alphabet:
-            raise RuntimeError("TreeHistServer was passed a padding character that is in the provided alphabet. The padding character must not be in the alphabet.")
+        if alphabet is not None and padding_char in alphabet:
+            raise RuntimeError("TreeHistClient was passed a padding character that is in the provided alphabet. The padding character must not be in the alphabet.")
 
         if isinstance(fo_server, FreqOracleServer):
             server = fo_server

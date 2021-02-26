@@ -20,7 +20,7 @@ class TreeHistClient(HeavyHitterClient):
 
         self.num_n_grams = int(max_string_length / fragment_length)  # Number of N-grams
 
-        if padding_char in alphabet:
+        if (alphabet is not None) and (padding_char in alphabet):
             raise RuntimeError("TreeHistClient was passed a padding character that is in the provided alphabet. The padding character must not be in the alphabet.")
 
         self.client.update_params(epsilon=epsilon/2, index_mapper=self.index_mapper)
