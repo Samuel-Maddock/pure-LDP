@@ -14,9 +14,10 @@ if os.path.exists("./pure_ldp.egg-info"):
 
 setup(
     name='pure-ldp',
-    version='1.1.0',
-    packages=find_packages(exclude=['*development*', "*apple_sf*", "*treehistogram*", "*rappor*",
-                                    "*priv_count_sketch*", "*hashtogram*", "*explicit_hist*", ]),
+    version='1.1.1',
+    packages=find_packages(exclude=['*development*',
+                                    "*hashtogram*", "*explicit_hist*", ]),
+
     install_requires=["xxhash", "numpy", "scipy", "bitstring", "bitarray"],
     url='https://github.com/Samuel-Maddock/pure-LDP',
     license='MIT',
