@@ -5,3 +5,5 @@ bitstring
 bitarray
 matplotlib
 seaborn
+statsmodels
+sklearn
