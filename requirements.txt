@@ -6,4 +6,4 @@ bitarray
 matplotlib
 seaborn
 statsmodels
-sklearn
+scikit-learn
