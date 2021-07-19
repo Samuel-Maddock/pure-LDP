@@ -18,8 +18,17 @@ To upgrade to the [latest version](https://pypi.org/project/pure-ldp/)
 ```bash
 pip install pure-ldp --upgrade
 ```
-Requires numpy, scipy, xxhash, bitarray and bitstring. For simulation plots, matplotlib and seaborn are required.
-
+Pure-LDP Requires the following Python modules 
+```
+xxhashnumpy
+scipy
+bitstring
+bitarray
+matplotlib
+seaborn
+statsmodels
+sklearn
+```
 
  ## Outline
 
