@@ -20,7 +20,8 @@ pip install pure-ldp --upgrade
 ```
 Pure-LDP Requires the following Python modules 
 ```
-xxhashnumpy
+xxhash
+numpy
 scipy
 bitstring
 bitarray
