@@ -2,10 +2,9 @@
 
 pure-LDP is a Python package that provides simple implementations of various state-of-the-art LDP algorithms (both Frequency Oracles and Heavy Hitters) with the main goal of providing a single, simple interface to benchmark and experiment with these algorithms.
 
-pure-LDP started as a package for pure LDP frequency oracles detailed in the paper 
-["Locally Differentially Private Protocols for Frequency Estimation"](https://www.usenix.org/conference/usenixsecurity17/technical-sessions/presentation/wang-tianhao) by Wang et al but has evolved to implement many other state-of-the art LDP frequency estimation protocols like Apple's CMS/HCMS and Google's RAPPOR. It also contains implementations of various heavy hitter protocols like Apple's Sequence Fragment Puzzle (SFP) and Prefix Extending Method (PEM).
+If pure-LDP is useful to you and has been used in your work in any way we would appreciate a reference to:
 
-The main goal of the library is to develop a framework that allows easy use of frequency oracles (FOs) for benchmarking and experimentation, easy extension to implement new oracles and the flexibility to swap out FOs in current protocols (i.e mixing and matching FOs with heavy hitter protocols).
+* [Graham Cormode, Samuel Maddock, and Carsten Maple. Frequency Estimation under Local Differential Privacy. PVLDB, 14(11): 2046 - 2058, 2021](http://vldb.org/pvldb/vol14/p2046-cormode.pdf)
 
 ## Installation
 
