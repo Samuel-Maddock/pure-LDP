@@ -14,7 +14,7 @@ if os.path.exists("./pure_ldp.egg-info"):
 
 setup(
     name='pure-ldp',
-    version='1.1.2',
+    version='1.2.0',
     packages=find_packages(exclude=['*development*',
                                     "*hashtogram*", "*explicit_hist*", ]),
 
