@@ -52,6 +52,7 @@ class UEClient(FreqOracleClient):
 
         """
         oh_vec = np.random.choice([1, 0], size=self.d, p=[self.q, 1-self.q])  # If entry is 0, flip with prob q
+        oh_vec[index] = 0
         if random.random() < self.p:
             oh_vec[index] = 1
         return oh_vec
