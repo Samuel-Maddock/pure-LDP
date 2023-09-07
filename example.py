@@ -5,7 +5,18 @@ import numpy as np
 from collections import Counter
 
 # Super simple synthetic dataset
-data = np.concatenate(([1] * 8000, [2] * 4000, [3] * 1000, [4] * 500, [5] * 1000, [6] * 1800, [7] * 2000, [8] * 300))
+data = np.concatenate(
+    (
+        [1] * 8000,
+        [2] * 4000,
+        [3] * 1000,
+        [4] * 500,
+        [5] * 1000,
+        [6] * 1800,
+        [7] * 2000,
+        [8] * 300,
+    )
+)
 original_freq = list(Counter(data).values())  # True frequencies of the dataset
 
 # Parameters for experiment
@@ -16,12 +27,12 @@ is_oue = True
 is_olh = True
 
 # Optimal Local Hashing (OLH)
-client_olh = LHClient(epsilon=epsilon, d=d, use_olh=True)
-server_olh = LHServer(epsilon=epsilon, d=d, use_olh=True)
+client_olh = LHClient(epsilon=epsilon, d=d, use_olh=is_olh)
+server_olh = LHServer(epsilon=epsilon, d=d, use_olh=is_olh)
 
 # Optimal Unary Encoding (OUE)
-client_oue = UEClient(epsilon=epsilon, d=d, use_oue=True)
-server_oue = UEServer(epsilon=epsilon, d=d, use_oue=True)
+client_oue = UEClient(epsilon=epsilon, d=d, use_oue=is_oue)
+server_oue = UEServer(epsilon=epsilon, d=d, use_oue=is_oue)
 
 # Threshold Histogram Encoding (THE)
 client_the = HEClient(epsilon=epsilon, d=d)
@@ -32,8 +43,8 @@ server_hr = HadamardResponseServer(epsilon, d)
 client_hr = HadamardResponseClient(epsilon, d, server_hr.get_hash_funcs())
 
 # Apple's Count Mean Sketch (CMS)
-k = 128 # 128 hash functions
-m = 1024 # Each hash function maps to the domain {0, ... 1023}
+k = 128  # 128 hash functions
+m = 1024  # Each hash function maps to the domain {0, ... 1023}
 
 server_cms = CMSServer(epsilon, k, m)
 client_cms = CMSClient(epsilon, server_cms.get_hash_funcs(), m)
@@ -72,7 +83,7 @@ for i in range(0, d):
 
 priv_data = [client_cms.privatise(item) for item in data]
 server_cms.aggregate_all(priv_data)
-cms_estimates = server_cms.estimate_all(range(1, d+1))
+cms_estimates = server_cms.estimate_all(range(1, d + 1))
 
 # ------------------------------ Experiment Output (calculating variance) -------------------------
 
@@ -86,7 +97,15 @@ for i in range(0, d):
 mse_arr = mse_arr / d
 
 print("\n")
-print("Experiment run on a dataset of size", len(data), "with d=", d, "and epsilon=", epsilon, "\n")
+print(
+    "Experiment run on a dataset of size",
+    len(data),
+    "with d=",
+    d,
+    "and epsilon=",
+    epsilon,
+    "\n",
+)
 print("Optimised Local Hashing (OLH) Variance: ", mse_arr[0])
 print("Optimised Unary Encoding (OUE) Variance: ", mse_arr[1])
 print("Threshold Histogram Encoding (THE) Variance: ", mse_arr[2])
@@ -106,8 +125,12 @@ print("Note: We round estimates to the nearest integer")
 
 # ------------------------------ Heavy Hitters - PEM Simulation -------------------------
 
-pem_client = PEMClient(epsilon=3, start_length=2, max_string_length=6, fragment_length=2)
-pem_server = PEMServer(epsilon=3, start_length=2, max_string_length=6, fragment_length=2)
+pem_client = PEMClient(
+    epsilon=3, start_length=2, max_string_length=6, fragment_length=2
+)
+pem_server = PEMServer(
+    epsilon=3, start_length=2, max_string_length=6, fragment_length=2
+)
 
 s1 = "101101"
 s2 = "111111"
@@ -124,8 +147,8 @@ for index, item in enumerate(data):
     pem_server.aggregate(priv)
 
 # Can either specify top-k based or threshold based
-    # Threshold of 0.05 means we find any possible heavy hitters that have a frequency >= 5%
-    # Top-k of three means we try to find the top-3 most frequent strings
+# Threshold of 0.05 means we find any possible heavy hitters that have a frequency >= 5%
+# Top-k of three means we try to find the top-3 most frequent strings
 
 heavy_hitters, frequencies = pem_server.find_heavy_hitters(threshold=0.05)
 print("Top strings found are:", heavy_hitters, " with frequencies", frequencies)
