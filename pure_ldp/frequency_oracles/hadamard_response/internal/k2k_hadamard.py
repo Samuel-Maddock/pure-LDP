@@ -43,7 +43,7 @@ class Hadamard_Rand_high_priv:
                                   
     def encode_symbol(self,in_symbol):  # encode a single symbol into a privatized version
         bitin = bin(int(in_symbol)+1)[2:].zfill(self.outbit) #map the input symbol x to x+1 since we are not using the first column of the matrix
-        out1 = random.randint(0,math.pow(2,self.outbit)-1) #get a random number in the output alphabet as one potential output
+        out1 = random.randint(0, (1 << self.outbit) - 1)  # get a random number in the output alphabet as one potential output, patched to avoid float range
         bitout1 = bin(out1)[2:].zfill(self.outbit)
         for i in range(0,self.outbit): #flip the bit of out1 corresponding to the left most bit in (in_symbol+1) which is one to get the other potential output
             if int(bitin[i]) == 1:
